@@ -2,6 +2,7 @@
 <head>
 </head>
 <body>
+<h1>An embedded Kaltura player... with a difference</h1>
 <script src="http://cdnapi.kaltura.com/p/1759182/sp/175918200/embedIframeJs/uiconf_id/24705811/partner_id/1759182"></script>
 <div id="kaltura_player_1402702517" style="width: 400px; height: 333px;" itemprop="video" itemscope itemtype="http://schema.org/VideoObject">
 <span itemprop="name" content="DemoPano1.mov"></span>
@@ -13,6 +14,7 @@
 <!-- 0_yk83ppmr
 1_ynznt8o3 -->
 <script>
+var KALTURA_ENTRYID="1_ynznt8o3";
 mw.setConfig('Kaltura.LeadWithHTML5', true);
 mw.setConfig('mediaProxy.preferedFlavorBR', 2000);
 kWidget.embed({
@@ -21,6 +23,7 @@ kWidget.embed({
   "uiconf_id": 24705811,
   'flashvars':{
   	'autoPlay':true,
+  	"oculusScreenBtn":{"plugin":true},
     'externalInterfaceDisabled':false,
 		'metadataProfileId':  3564441, // the metadata profile id from your account
 		'requiredMetadataFields' : true 

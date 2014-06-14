@@ -1,4 +1,4 @@
-
+var HEAD_LOCATION;
 var ALL_JS_LOADED = false;
 
 var video_top_angle=0.0; //45;
@@ -44,6 +44,9 @@ var video_right_angle=360;
 		//loadjscssfiles(['js/jquery-ui.min.js','js/jquery.base64.min.js','js/zpipe.min.js','js/three.js','js/RequestAnimationFrame.js','js/gamepad.js','js/vr.js','js/OculusRiftEffect.js','js/panoVid.js'],'js', runIfNeeded);
 	loadjscssfiles(['js/three.js','js/RequestAnimationFrame.js','js/gamepad.js','js/vr.js','js/OculusRiftEffect.js','js/panoVid.js'],'js', runIfNeeded);
 	
+
+
+  	
 	
 	/* stemokowski
 		loadjscssfile('TestDynamic.js','js')
@@ -68,7 +71,6 @@ var video_right_angle=360;
 	}
 	
 	function testMetaData(){
-		alert('OOOH YEAH!');
 				embedPlayer=targetElementForOSV;
 			var customDataList = embedPlayer.evaluate('{mediaProxy.entryMetadata}');
 			console.log('metadata', customDataList);
@@ -135,9 +137,9 @@ var video_right_angle=360;
 		}
 	}
 		
-	function buttonPlugin ( mwOutsideDelegate, $ ) {"use strict";
+	function oculusButtonPlugin ( mwOutsideDelegate ) {"use strict";
 		var mw=mwOutsideDelegate.delegateTarget;
-	mw.PluginManager.add( 'fullScreenBtn2', mw.KBaseComponent.extend({
+	mw.PluginManager.add( 'oculusFullScreenBtn', mw.KBaseComponent.extend({
 
 		defaultConfig: {
 			"align": "right",
@@ -154,7 +156,6 @@ var video_right_angle=360;
 		exitFullscreenTxt: gM( 'mwe-embedplayer-player_closefullscreen' ),
 			
 		setup: function( embedPlayer ) {
-			alert('SET ME UP!');
 			this.addBindings();
 		},
 		isSafeEnviornment: function(){
@@ -184,11 +185,79 @@ var video_right_angle=360;
 				_this.getComponent().removeClass( _this.offIconClass ).addClass( _this.onIconClass );
 				_this.updateTooltip( _this.exitFullscreenTxt );
                 _this.setAccessibility(_this.$el,_this.exitFullscreenTxt);
+                USE_RIFT=true;
 			});
 			this.bind('onCloseFullScreen', function() {
 				_this.getComponent().removeClass( _this.onIconClass ).addClass( _this.offIconClass );
 				_this.updateTooltip( _this.enterFullscreenTxt );
                 _this.setAccessibility(_this.$el,_this.enterFullscreenTxt);
+                USE_RIFT=false;
+			});
+		},
+		toggleFullscreen: function() {
+			this.getPlayer().toggleFullscreen();
+		}
+	}));
+
+};
+
+//Based on fullScreenBtn
+
+	function noOculusButtonPlugin ( mwOutsideDelegate ) {"use strict";
+		var mw=mwOutsideDelegate.delegateTarget;
+	mw.PluginManager.add( 'noOculusFullScreenBtn', mw.KBaseComponent.extend({
+
+		defaultConfig: {
+			"align": "right",
+			"parent": "controlsContainer",
+			"order": 51,
+			"showTooltip": true,
+			"displayImportance": "high"
+		},
+
+		offIconClass: 'icon-expand',
+		onIconClass: 'icon-contract',
+
+		enterFullscreenTxt: gM( 'mwe-embedplayer-player_fullscreen' ),
+		exitFullscreenTxt: gM( 'mwe-embedplayer-player_closefullscreen' ),
+			
+		setup: function( embedPlayer ) {
+			this.addBindings();
+		},
+		isSafeEnviornment: function(){
+			return mw.getConfig( 'EmbedPlayer.EnableFullscreen' );
+		},
+		getComponent: function() {
+			var _this = this;
+			if( !this.$el ) {
+				this.$el = $( '<button />' )
+							.attr( 'title', this.enterFullscreenTxt )
+							.addClass( "btn " + this.offIconClass + this.getCssClass() )
+							.click( function() {
+								_this.toggleFullscreen();
+							});
+			}
+            this.setAccessibility(this.$el,this.enterFullscreenTxt);
+			return this.$el;
+		},
+		addBindings: function() {
+			var _this = this;
+			// Add double click binding
+			this.bind('dblclick', function(){
+				_this.toggleFullscreen();
+			});
+			// Update fullscreen icon
+			this.bind('onOpenFullScreen', function() {
+				_this.getComponent().removeClass( _this.offIconClass ).addClass( _this.onIconClass );
+				_this.updateTooltip( _this.exitFullscreenTxt );
+                _this.setAccessibility(_this.$el,_this.exitFullscreenTxt);
+                USE_RIFT=false;
+			});
+			this.bind('onCloseFullScreen', function() {
+				_this.getComponent().removeClass( _this.onIconClass ).addClass( _this.offIconClass );
+				_this.updateTooltip( _this.enterFullscreenTxt );
+                _this.setAccessibility(_this.$el,_this.enterFullscreenTxt);
+                USE_RIFT=false;
 			});
 		},
 		toggleFullscreen: function() {
@@ -255,20 +324,22 @@ function receiveMessage(event)
 		video_bottom_angle=parseFloat(curResult.metaData.BottomAngle);
 		video_left_angle=parseFloat(curResult.metaData.LeftAngle);
 		video_right_angle=parseFloat(curResult.metaData.RightAngle);
+	} else if ('headTracking' in curResult)
+	{
+		//console.log('head tracking: ', curResult.headTracking);
+		HEAD_LOCATION=curResult.headTracking;
 	}
   // ...
 }
 
 mo.observe(document.body, options);
 	
-		//mw.kalturaPluginWrapper(buttonPlugin);
 
 	mw.addKalturaConfCheck(function( embedPlayer, callback ) {
 		mw.log("ExternalResources:: IframeCustomPluginJs1:: CheckConfig");
 		embedPlayer.setKDPAttribute("myCustomPlugin", "foo", "bar");
 		targetElementForOSV=embedPlayer;
 		embedPlayer.bindHelper("playerReady", setUpCanvas);
-		
 		// continue player build out
 		callback();
 		//embedPlayer.bindHelper("playerReady", setUpCanvas);
@@ -279,3 +350,5 @@ mo.observe(document.body, options);
 //	nativeEmbedPlayerPid
 })( window.mw, jQuery );
 
+		window.mw.kalturaPluginWrapper(oculusButtonPlugin);
+		window.mw.kalturaPluginWrapper(noOculusButtonPlugin);

@@ -19,7 +19,7 @@ var NAV_DELTA = 45;
 var FAR = 1000;
 var USE_DEPTH = true;
 var WORLD_FACTOR = 1.0;
-var USE_RIFT=true;
+var USE_RIFT=false;
 var OculusRift = {
   // Parameters from the Oculus Rift DK1
   hResolution: 1280,
@@ -87,7 +87,7 @@ function setUpVideoForTexture()
 		videoImage.height = videoElement.videoHeight;
 		videoImageContext = videoImage.getContext( '2d' );
 		// background color if no video present
-		videoImageContext.fillStyle = '#00ff00';
+		videoImageContext.fillStyle = '#808080';
 		videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
 		videoTexture.needsUpdate = true;
 	};
@@ -152,7 +152,7 @@ function initWebGL() {
 	
 	videoImageContext = videoImage.getContext( '2d' );
 	// background color if no video present
-	videoImageContext.fillStyle = '#ff0000';
+	videoImageContext.fillStyle = '#808080';
 	videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
 
 	videoTexture = new THREE.Texture( videoImage );
@@ -449,19 +449,27 @@ function resize( event ) {
 function loop() {
   requestAnimationFrame( loop );
 
+  	ps=null;
   // User vr plugin
   if (!USE_TRACKER && VRState !== null) {
-  	ps=null;
   	try{
   		ps=vr.pollState(VRState);
   	} catch(e)
   	{
   		ps=null;
   	}
-    if (ps) {
-      HMDRotation.set(VRState.hmd.rotation[0], VRState.hmd.rotation[1], VRState.hmd.rotation[2], VRState.hmd.rotation[3]);
-    }
   }
+    if (USE_RIFT && ps) {
+      HMDRotation.set(VRState.hmd.rotation[0], VRState.hmd.rotation[1], VRState.hmd.rotation[2], VRState.hmd.rotation[3]);
+    } else if(HEAD_LOCATION)
+    {
+    	var x=parseFloat(HEAD_LOCATION.x);
+    	var y=parseFloat(HEAD_LOCATION.y);
+    	var z=parseFloat(HEAD_LOCATION.z);
+    	var headEuler=new THREE.Euler( Math.sin(y/z), Math.sin(-x/z), 0, 'XYZ' );
+    	//console.log(headEuler);
+    	HMDRotation.setFromEuler(headEuler);
+    }
 
   // Compute move vector
   moveVector.addVectors(keyboardMoveVector, gamepadMoveVector);

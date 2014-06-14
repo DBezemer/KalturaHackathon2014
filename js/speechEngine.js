@@ -159,6 +159,19 @@
             }
           }
         }
+        if(results.length>0)
+        {
+        	this.abort();
+        	self=this;
+            var textToSay = "I thought you said "+results[0].transcript.trim()+", but I couldn't understand it.";
+			var msg = new SpeechSynthesisUtterance(textToSay);
+			msg.onend = function(e) {
+							//Within iframe use currentState;
+					self.start();
+  							//console.log('Finished in ' + event.elapsedTime + ' seconds.');
+			};
+			window.speechSynthesis.speak(msg);	
+        }
         invokeCallbacks(callbacks.resultNoMatch);
         return false;
       };
