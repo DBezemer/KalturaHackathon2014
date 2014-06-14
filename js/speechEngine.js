@@ -238,6 +238,30 @@
       }
     },
 
+    // Add additional commands that videoSpeechEngine will respond to. Similar in syntax to videoSpeechEngine.init()
+    addRegexCommands: function(commands) {
+      var cb,
+          command;
+
+      initIfNeeded();
+
+      for (var phrase in commands) {
+        if (commands.hasOwnProperty(phrase)) {
+          cb = root[commands[phrase]] || commands[phrase];
+          if (typeof cb !== 'function') {
+            continue;
+          }
+          //convert command to regex
+          command = new RegExp(phrase, 'i');;//commandToRegExp(phrase);
+
+          commandsList.push({ command: command, callback: cb, originalPhrase: phrase });
+        }
+      }
+      if (debugState) {
+        root.console.log('Commands successfully loaded: %c'+commandsList.length, debugStyle);
+      }
+    },
+
     // Remove existing commands. Called with a single phrase, array of phrases, or methodically. Pass no params to remove all commands.
     removeCommands: function(commandsToRemove) {
       if (commandsToRemove === undefined) {

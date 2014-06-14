@@ -19,6 +19,7 @@ var NAV_DELTA = 45;
 var FAR = 1000;
 var USE_DEPTH = true;
 var WORLD_FACTOR = 1.0;
+var USE_RIFT=true;
 var OculusRift = {
   // Parameters from the Oculus Rift DK1
   hResolution: 1280,
@@ -92,6 +93,41 @@ function setUpVideoForTexture()
 	};
 };
 
+function createRenderers()
+{
+
+  // Create render
+  try {
+    renderer = new THREE.WebGLRenderer({'canvas':canvasElement});
+  }
+  catch(e){
+    alert('This application needs WebGL enabled!');
+    return false;
+  }
+
+  renderer.autoClearColor = false;
+  renderer.setSize( WIDTH, HEIGHT );
+
+  // Add stereo effect
+
+  // Set the window resolution of the rift in case of not native
+  OculusRift.hResolution = WIDTH, OculusRift.vResolution = HEIGHT,
+
+  effect = new THREE.OculusRiftEffect( renderer, {HMD:OculusRift, worldFactor:WORLD_FACTOR} );
+  effect.setSize(WIDTH, HEIGHT );
+  
+  if( videoTexture)
+  {
+  	videoTexture = new THREE.Texture( videoImage );
+	videoTexture.minFilter = THREE.LinearFilter;
+	videoTexture.magFilter = THREE.LinearFilter;
+	
+	videoMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
+ 	if(projSphere)
+ 		projSphere.material = videoMaterial ;
+  }
+};
+
 function initWebGL() {
   // create scene
   scene = new THREE.Scene();
@@ -99,7 +135,7 @@ function initWebGL() {
   // Create camera
   camera = new THREE.PerspectiveCamera( 60, WIDTH/HEIGHT, 0.1, FAR );
   camera.target = new THREE.Vector3( 1, 0, 0 );
-  camera.useQuaternion = true;
+  //camera.useQuaternion = true; //No longer needed
   scene.add( camera );
 
   // Add projection sphere
@@ -126,7 +162,7 @@ function initWebGL() {
 	videoMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
   projSphere = new THREE.Mesh( new THREE.SphereGeometry( 500, 32, 32 ), videoMaterial );
   projSphere.geometry.dynamic = true;
-  projSphere.useQuaternion = true;
+  //projSphere.useQuaternion = true; //No longer needed
   scene.add( projSphere );
 
   // Add Progress Bar
@@ -138,26 +174,7 @@ function initWebGL() {
 //  progBar.translateZ(0.2);
 //  progBarContainer.add(progBar);
 
-  // Create render
-  try {
-    renderer = new THREE.WebGLRenderer({'canvas':canvasElement});
-  }
-  catch(e){
-    alert('This application needs WebGL enabled!');
-    return false;
-  }
-
-  renderer.autoClearColor = false;
-  renderer.setSize( WIDTH, HEIGHT );
-
-  // Add stereo effect
-
-  // Set the window resolution of the rift in case of not native
-  OculusRift.hResolution = WIDTH, OculusRift.vResolution = HEIGHT,
-
-  effect = new THREE.OculusRiftEffect( renderer, {HMD:OculusRift, worldFactor:WORLD_FACTOR} );
-  effect.setSize(WIDTH, HEIGHT );
-
+	createRenderers();
 }
 
 function initControls() {
@@ -213,6 +230,9 @@ function initControls() {
       case 40:case 83:
         keyboardMoveVector.x = 0.0;
         break;
+      case 82:
+      	USE_RIFT=!USE_RIFT;
+      	break;
     }
   });
 
@@ -379,8 +399,14 @@ function initVR() {
     }
 
     VRState = new vr.State();
+    try{
     if (!vr.pollState(VRState)) {
       //console.warn('NPVR plugin not found/error polling');
+      VRState = null;
+      return;
+    }
+    } catch(e)
+    { 
       VRState = null;
       return;
     }
@@ -395,8 +421,16 @@ function initVR() {
 }
 
 function render() {
-  effect.render( scene, camera );
-  //renderer.render(scene, camera);
+	if(renderer.domElement!=canvasElement)
+		initWebGL();
+		
+  	if(USE_RIFT)
+		effect.render( scene, camera );
+	else
+	{
+		renderer.setViewport(0,0,window.innerWidth,window.innerHeight);
+  		renderer.render(scene, camera);
+  	}
 }
 
 
@@ -417,7 +451,14 @@ function loop() {
 
   // User vr plugin
   if (!USE_TRACKER && VRState !== null) {
-    if (vr.pollState(VRState)) {
+  	ps=null;
+  	try{
+  		ps=vr.pollState(VRState);
+  	} catch(e)
+  	{
+  		ps=null;
+  	}
+    if (ps) {
       HMDRotation.set(VRState.hmd.rotation[0], VRState.hmd.rotation[1], VRState.hmd.rotation[2], VRState.hmd.rotation[3]);
     }
   }

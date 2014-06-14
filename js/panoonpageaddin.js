@@ -61,6 +61,29 @@
 			this.addPlayerBindings();
 		},
 		loadSpeechCommands:function(){
+			self=this;
+			function buildSpeechCommand(pattern)
+			{
+				return function()
+				{	
+					if('goto' in pattern)
+					{
+						self.kdp.sendNotification ('changeMedia', {'entryId':pattern.goto});
+					}
+					if('say' in pattern)
+					{
+						var msg = new SpeechSynthesisUtterance(pattern.say);
+						videoSpeechEngine.abort();
+						msg.onend = function(e) {
+							//Within iframe use currentState;
+							videoSpeechEngine.start();
+  							//console.log('Finished in ' + event.elapsedTime + ' seconds.');
+						};
+
+						window.speechSynthesis.speak(msg);
+					}
+				};
+			};
 			if (videoSpeechEngine) {
   			// Let's define our first command. First the text we expect, and then the function it should call
   				var commands = {
@@ -80,10 +103,17 @@
   					{
   						speechPatterns=[speechPatterns];
   					}
-  					for(var patternString in speechPatterns)
+  					for(var patternIndex in speechPatterns)
   					{
   						try{
+  							var patternString=speechPatterns[patternIndex];
 	  						var pattern=JSON.parse(patternString);
+		  					console.log('pattern:',pattern);
+	  						if('regex' in pattern)
+	  						{
+	  							console.log('installing pattern for :',pattern.regex);
+	  							regexCommands[pattern.regex]=buildSpeechCommand(pattern);
+	  						}
 	  					} catch(e)
 	  					{
 	  					}
@@ -91,7 +121,8 @@
   				}
 
 		  // Add our commands to annyang
-  				videoSpeechEngine.addCommands(commands);
+		  		console.log('REGEX commands:',regexCommands);
+  				videoSpeechEngine.addRegexCommands(regexCommands);
 
 		  // Start listening. You can call this here, or attach this call to an event, button, etc.
 		  		//alert(this.kdp.evaluate('{video.player.kdpState}'));
