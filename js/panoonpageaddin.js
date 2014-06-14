@@ -77,7 +77,60 @@ document.addEventListener('headtrackrStatus', handleheadtrackrStatusEvent, true)
   	}
   	
   	loadjscssfiles(['js/headtrackr.js'],'js',startHeadtrackr);
-  	
+ 
+KalturaOfficeInfo= {"1_6mjnzjx1": "Kaltura Kitchen",
+"1_crrvzz9n": "Kaltura Server Room",
+"1_2zri7adb": "Main Office Area",
+"1_rj4qhcbv": "Large Meeting Room",
+"1_n8m3w8y2": "Meeting Room with Windows",
+"1_wmsowqoo": "Kaltura Lobby",
+"1_9seq8pkw": "Kaltura Elevators",
+"1_11gu6jks": "Bicycle video"};
+
+var metaDataOverride={"1_ynznt8o3":{
+				"TopAngle": "45", //"45",
+				"BottomAngle": "135", //"135",
+				"LeftAngle": "0",
+				"RightAngle": "360",
+				"SayAfterVideo": "Please tell me where you want to go next",
+				"backgroundImage":"",
+				"SpeechPattern": [JSON.stringify({"regex":"bike","goto":"1_11gu6jks"}), 
+									JSON.stringify({"regex":"bicycle","goto":"1_11gu6jks"}),
+									JSON.stringify({"regex":"next","goto":"0_yk83ppmr","say":"going to next video"})],
+				}
+			};
+			
+for(k in KalturaOfficeInfo)
+{
+	metaDataOverride[k]={
+				"TopAngle": "45", //"45",
+				"BottomAngle": "135", //"135",
+				"LeftAngle": "0",
+				"RightAngle": "360",
+				"SayAfterVideo": "That was "+KalturaOfficeInfo[k],
+				"backgroundImage":"",
+				"SpeechPattern": [JSON.stringify({"regex":"bike","goto":"1_11gu6jks"}), 
+									JSON.stringify({"regex":"bicycle","goto":"1_11gu6jks"}),
+									JSON.stringify({"regex":"office","goto":"1_2zri7adb"}),
+									JSON.stringify({"regex":"cubicle","goto":"1_2zri7adb"}),
+									JSON.stringify({"regex":"hackathon","goto":"1_2zri7adb"}),
+									JSON.stringify({"regex":"kitchen","goto":"1_6mjnzjx1"}),
+									JSON.stringify({"regex":"toilet","goto":"1_6mjnzjx1"}),
+									JSON.stringify({"regex":"bathroom","goto":"1_6mjnzjx1"}),
+									JSON.stringify({"regex":"restroom","goto":"1_6mjnzjx1"}),
+									JSON.stringify({"regex":"server","goto":"1_crrvzz9n"}),
+									JSON.stringify({"regex":"elevators","goto":"1_9seq8pkw"}),
+									JSON.stringify({"regex":"lifts","goto":"1_9seq8pkw"}),
+									JSON.stringify({"regex":"entrance","goto":"1_9seq8pkw"}),
+									JSON.stringify({"regex":"lobby","goto":"1_wmsowqoo"}),
+									JSON.stringify({"regex":"meeting","goto":"1_n8m3w8y2"}),
+									JSON.stringify({"regex":"window","goto":"1_n8m3w8y2"}),
+									JSON.stringify({"regex":"next","goto":"0_yk83ppmr","say":"going to next video"})],
+				}
+}
+
+console.log(metaDataOverride);
+ 	
 (function(){
 	// This is a generic onPage plugin you will want to subscribe to the ready event: 
 	kWidget.addReadyCallback( function( playerId ){
@@ -188,18 +241,7 @@ document.addEventListener('headtrackrStatus', handleheadtrackrStatusEvent, true)
 		metadataLoaded:function (){
 			this.customDataList = this.kdp.evaluate('{mediaProxy.entryMetadata}');
 			console.log('METADATA LOADED', this.customDataList);
-			metaDataOverride={"1_ynznt8o3":{
-				"TopAngle": "45", //"45",
-				"BottomAngle": "135", //"135",
-				"LeftAngle": "0",
-				"RightAngle": "360",
-				"SayAfterVideo": "Please tell me where you want to go next",
-				"backgroundImage":"",
-				"SpeechPattern": [JSON.stringify({"regex":"bike","goto":"1_11gu6jks"}), 
-									JSON.stringify({"regex":"bicycle","goto":"1_11gu6jks"}),
-									JSON.stringify({"regex":"next","goto":"0_yk83ppmr","say":"going to next video"})],
-				}
-			};
+			
 			console.log('kdp: ',this.kdp);
 			if(this.entryId in metaDataOverride)
 			{

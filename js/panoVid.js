@@ -466,7 +466,7 @@ function loop() {
     	var x=parseFloat(HEAD_LOCATION.x);
     	var y=parseFloat(HEAD_LOCATION.y);
     	var z=parseFloat(HEAD_LOCATION.z);
-    	var headEuler=new THREE.Euler( Math.sin(y/z), Math.sin(-x/z), 0, 'XYZ' );
+    	var headEuler=new THREE.Euler( Math.sin(-y/z), Math.sin(x/z), 0, 'XYZ' );
     	//console.log(headEuler);
     	HMDRotation.setFromEuler(headEuler);
     }

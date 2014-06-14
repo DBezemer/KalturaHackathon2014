@@ -1,4 +1,7 @@
 var HEAD_LOCATION;
+var BG_IMAGE_NAME;
+var BG_IMAGE;
+
 var ALL_JS_LOADED = false;
 
 var video_top_angle=0.0; //45;
@@ -99,6 +102,7 @@ var video_right_angle=360;
 		canvasElement.style.padding="0";
 		canvasElement.id='customRenderingCanvas';
 		videoElement.parentNode.appendChild(canvasElement);
+		
 		if(window.setUpVideoForTexture)
 			setUpVideoForTexture();
 		}
@@ -152,7 +156,7 @@ var video_right_angle=360;
 		offIconClass: 'icon-expand',
 		onIconClass: 'icon-contract',
 
-		enterFullscreenTxt: gM( 'mwe-embedplayer-player_fullscreen' ),
+		enterFullscreenTxt: 'Oculus Rift mode',
 		exitFullscreenTxt: gM( 'mwe-embedplayer-player_closefullscreen' ),
 			
 		setup: function( embedPlayer ) {
@@ -168,6 +172,7 @@ var video_right_angle=360;
 							.attr( 'title', this.enterFullscreenTxt )
 							.addClass( "btn " + this.offIconClass + this.getCssClass() )
 							.click( function() {
+								USE_RIFT=true;
 								_this.toggleFullscreen();
 							});
 			}
@@ -185,7 +190,7 @@ var video_right_angle=360;
 				_this.getComponent().removeClass( _this.offIconClass ).addClass( _this.onIconClass );
 				_this.updateTooltip( _this.exitFullscreenTxt );
                 _this.setAccessibility(_this.$el,_this.exitFullscreenTxt);
-                USE_RIFT=true;
+                
 			});
 			this.bind('onCloseFullScreen', function() {
 				_this.getComponent().removeClass( _this.onIconClass ).addClass( _this.offIconClass );
@@ -218,7 +223,7 @@ var video_right_angle=360;
 		offIconClass: 'icon-expand',
 		onIconClass: 'icon-contract',
 
-		enterFullscreenTxt: gM( 'mwe-embedplayer-player_fullscreen' ),
+		enterFullscreenTxt: 'Full screen mode',
 		exitFullscreenTxt: gM( 'mwe-embedplayer-player_closefullscreen' ),
 			
 		setup: function( embedPlayer ) {
@@ -234,6 +239,7 @@ var video_right_angle=360;
 							.attr( 'title', this.enterFullscreenTxt )
 							.addClass( "btn " + this.offIconClass + this.getCssClass() )
 							.click( function() {
+								USE_RIFT=false;
 								_this.toggleFullscreen();
 							});
 			}
@@ -251,7 +257,7 @@ var video_right_angle=360;
 				_this.getComponent().removeClass( _this.offIconClass ).addClass( _this.onIconClass );
 				_this.updateTooltip( _this.exitFullscreenTxt );
                 _this.setAccessibility(_this.$el,_this.exitFullscreenTxt);
-                USE_RIFT=false;
+                
 			});
 			this.bind('onCloseFullScreen', function() {
 				_this.getComponent().removeClass( _this.onIconClass ).addClass( _this.offIconClass );
