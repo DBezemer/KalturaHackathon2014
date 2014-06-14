@@ -14,6 +14,39 @@
 			new panoOnPage( playerId );
 		}
 	});
+	
+	
+	//Function from http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
+	var loadjscssfiles=function (filenames, filetype, callback){
+		callback=callback||function(){};
+		filename=filenames[0];
+		var actualCallback;
+		if(filenames.length>1)
+		{
+			nextFilenames=filenames.slice(1);
+			actualCallback=function(){console.log('loaded js ',filename, 'next: ', nextFilenames);loadjscssfiles(nextFilenames, filetype, callback)};
+		} else actualCallback=callback;
+ 		if (filetype=="js"){ //if filename is a external JavaScript file
+  			var fileref=document.createElement('script');
+  			fileref.setAttribute("type","text/javascript");
+  			fileref.setAttribute("src", filename);
+  			fileref.onload = actualCallback;
+  			document.head.appendChild(fileref);
+ 		}
+ 		else if (filetype=="css"){ //if filename is an external CSS file
+  			var fileref=document.createElement("link");
+  			fileref.setAttribute("rel", "stylesheet");
+  			fileref.setAttribute("type", "text/css");
+  			fileref.setAttribute("href", filename);
+  			fileref.onload = actualCallback;
+  			document.body.appendChild(fileref);
+ 		}
+ 		if (typeof fileref!="undefined")
+ 		{
+  			document.getElementsByTagName("head")[0].appendChild(fileref);
+  			document.body.appendChild(fileref);
+  		}
+	};
  
 	// There are a few conventions for creating javascirpt pseudo classes 
 	//  ( feel free use what you like )
@@ -24,15 +57,63 @@
 		init:function( playerId ){
 			this.playerId = playerId;
 			this.kdp = document.getElementById( playerId );	
-			this.iframe = kdp.getElementsByTagName('iframe');
+			this.iframe = this.kdp.getElementsByTagName('iframe')[0];
 			this.addPlayerBindings();
 		},
+		loadSpeechCommands:function(){
+			if (videoSpeechEngine) {
+  			// Let's define our first command. First the text we expect, and then the function it should call
+  				var commands = {
+    				'show tps report': function() {
+	      				alert('Here is the tps report');
+    				}
+  				};
+  				//for (var key in this.customDataList) {
+  				//	 var val = this.customDataList[key];
+  				//	console.log('metadata key: ',key, ', metadata value: ', val );
+  				//};
+  				regexCommands={};
+  				if('SpeechPattern' in this.customDataList)
+  				{
+  					var speechPatterns=this.customDataList.SpeechPattern;
+  					if( !(length in speechPatterns))
+  					{
+  						speechPatterns=[speechPatterns];
+  					}
+  					for(var patternString in speechPatterns)
+  					{
+  						try{
+	  						var pattern=JSON.parse(patternString);
+	  					} catch(e)
+	  					{
+	  					}
+  					}
+  				}
+
+		  // Add our commands to annyang
+  				videoSpeechEngine.addCommands(commands);
+
+		  // Start listening. You can call this here, or attach this call to an event, button, etc.
+		  		//alert(this.kdp.evaluate('{video.player.kdpState}'));
+  				//videoSpeechEngine.start();
+			}
+		},
 		metadataLoaded:function (){
-			var customDataList = this.kdp.evaluate('{mediaProxy.entryMetadata}');
-			console.log('METADATA LOADED', customDataList);
+			this.customDataList = this.kdp.evaluate('{mediaProxy.entryMetadata}');
+			console.log('METADATA LOADED', this.customDataList);
+			this.iframe.contentWindow.postMessage(JSON.stringify({'metaData':this.customDataList}), "*");
+			//console.log('loadjscssfiles: ', loadjscssfiles);
+			var self=this;
+			loadjscssfiles(['js/speechEngine.js'],'js', function(){self.loadSpeechCommands()});
 			//$.each( customDataList, function( key, val ){
 			//	console.log('metadata key: ',key, ', metadata value: ', val );
 			//})
+		},
+		startSpeechRecognition:function(){
+			videoSpeechEngine.start();
+		},
+		stopSpeechRecognition:function(){
+			videoSpeechEngine.abort();
 		},
 		addPlayerBindings:function(){
 		    try{
@@ -44,6 +125,15 @@
 			self=this;
 			this.kdp.addJsListener( 'metadataReceived', function (){
 				self.metadataLoaded();
+			});
+			this.kdp.addJsListener( 'playerPlayEnd', function (){
+				self.startSpeechRecognition();
+			});
+			this.kdp.addJsListener( 'playerPaused', function (){
+				self.startSpeechRecognition();
+			});
+			this.kdp.addJsListener( 'playerPlayed', function (){
+				self.stopSpeechRecognition();
 			});
 			//alert('metadata length:'+this.kdp.evaluate('{mediaProxy.entryMetadata}').length )
 			//this.metadataLoaded();

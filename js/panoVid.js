@@ -124,7 +124,7 @@ function initWebGL() {
 	videoTexture.magFilter = THREE.LinearFilter;
 	
 	videoMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
-  projSphere = new THREE.Mesh( new THREE.SphereGeometry( 500, 512, 256 ), videoMaterial );
+  projSphere = new THREE.Mesh( new THREE.SphereGeometry( 500, 32, 32 ), videoMaterial );
   projSphere.geometry.dynamic = true;
   projSphere.useQuaternion = true;
   scene.add( projSphere );
@@ -446,13 +446,11 @@ function loop() {
 	if ( videoElement && videoElement.readyState === videoElement.HAVE_ENOUGH_DATA ) 
 	{
 		
-var video_top_angle=45;
-var video_bottom_angle=135;
-var video_left_angle=0;
-var video_right_angle=360;
 		videoImageContext.drawImage( videoElement, 
-			video_left_angle/360.0*videoImage.width, video_top_angle/180.0*videoImage.height,
-			(video_right_angle-video_left_angle)/360.0*videoImage.width, (video_bottom_angle-video_top_angle)/180.0*videoImage.height );
+			Math.max(0.0,Math.min(videoImage.width, video_left_angle/360.0*videoImage.width)), 
+			Math.max(0.0,Math.min(videoImage.height, (1.0-video_bottom_angle/180.0)*videoImage.height)),
+			Math.max(0.0,Math.min(videoImage.width, (video_right_angle-video_left_angle)/360.0*videoImage.width)), 
+			Math.max(0.0,Math.min(videoImage.height, (video_bottom_angle-video_top_angle)/180.0*videoImage.height)) );
 		//console.log('drew image');
 		if ( videoTexture ) 
 		{

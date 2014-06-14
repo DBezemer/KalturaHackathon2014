@@ -1,8 +1,8 @@
 
 var ALL_JS_LOADED = false;
 
-var video_top_angle=45;
-var video_bottom_angle=135;
+var video_top_angle=0.0; //45;
+var video_bottom_angle=180.0; //135;
 var video_left_angle=0;
 var video_right_angle=360;
 	var videoElement;
@@ -178,6 +178,24 @@ options = {
 	// of “grandchild” nodes
 	'subtree': true
 }
+
+window.addEventListener("message", receiveMessage, false);
+
+function receiveMessage(event)
+{
+  //if (event.origin !== "http://example.org:8080")
+  //  return;
+ var curResult=JSON.parse(event.data);
+	if('metaData' in curResult)
+	{
+		video_top_angle=parseFloat(curResult.metaData.TopAngle);
+		video_bottom_angle=parseFloat(curResult.metaData.BottomAngle);
+		video_left_angle=parseFloat(curResult.metaData.LeftAngle);
+		video_right_angle=parseFloat(curResult.metaData.RightAngle);
+	}
+  // ...
+}
+
 mo.observe(document.body, options);
 	
 
