@@ -87,7 +87,12 @@ KalturaOfficeInfo= {"1_6mjnzjx1": "Kaltura Kitchen",
 "1_9seq8pkw": "Kaltura Elevators",
 "1_11gu6jks": "Bicycle video"};
 
-var metaDataOverride={"1_ynznt8o3":{
+var metaDataOverride={}
+
+OVERRIDE_METADATA=false;
+if(OVERRIDE_METADATA)
+{
+metaDataOverride={"1_ynznt8o3":{
 				"TopAngle": "45", //"45",
 				"BottomAngle": "135", //"135",
 				"LeftAngle": "0",
@@ -128,7 +133,63 @@ for(k in KalturaOfficeInfo)
 									JSON.stringify({"regex":"next","goto":"0_yk83ppmr","say":"going to next video"})],
 				}
 }
+metaDataOverride["1_11gu6jks"].TopAngle="0";
+metaDataOverride["1_11gu6jks"].BottomAngle="180";
 
+var DO_METADATA_UPDATE=true
+if(DO_METADATA_UPDATE)
+{
+kwidgetAPI=new kWidget.api( {
+			'wid' : '_243342',
+		});
+//Find the KS secret by logging in at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html
+KS_DO_NOT_SAVE_IN_CODE='THIS IS A BOGUS KS CODE. http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html'
+alert('KS secret is bogus. Code will fail');
+for(var k in metaDataOverride)
+{
+	var xmlResults='<metadata><TopAngle>'+metaDataOverride[k].TopAngle+'</TopAngle><BottomAngle>'+metaDataOverride[k].BottomAngle+'</BottomAngle>';
+	xmlResults+='<LeftAngle>'+metaDataOverride[k].LeftAngle+'</LeftAngle><RightAngle>'+metaDataOverride[k].RightAngle+'</RightAngle>'
+	xmlResults+='<SayAfterVideo>'+metaDataOverride[k].SayAfterVideo+'</SayAfterVideo>'
+	for (var i in metaDataOverride[k].SpeechPattern)
+	{
+		xmlResults+='<SpeechPattern>'+metaDataOverride[k].SpeechPattern[i]+'</SpeechPattern>';
+	}
+	xmlResults+='</metadata>';
+	(function(k_, xmlResults_ ){
+	console.log('requesting add of '+k_ +' to '+xmlResults);
+	kwidgetAPI.doRequest({
+				'ks': KS_DO_NOT_SAVE_IN_CODE,
+				'service':'metadata_metadata', 
+				'metadataProfileId':'3564441', 
+				'objectType':'1',
+				'action': 'add', 
+				'objectId': k_,
+				'xmlData':xmlResults_
+	}, function( data ){
+			console.log('ADD RESULTS:',data);
+			if('message' in data && data.message.substring(0,23) === "Metadata already exists")
+			{
+			console.log('requesting update of '+ k_ +' to '+xmlResults);
+			metadataId=data.message.substring(28,36);
+			// output formatted json result:
+			kwidgetAPI.doRequest({
+				'ks': KS_DO_NOT_SAVE_IN_CODE,
+				'service':'metadata_metadata', 
+				'metadataProfileId':'3564441', 
+				'objectType':'1',
+				'action': 'update', 
+				'objectId': k_,
+				'id': metadataId,
+				'xmlData':xmlResults_
+			}, function( data ){
+			// output formatted json result:
+			console.log('UPDATE RESULTS:',data);
+			})
+		}
+	})})(k, xmlResults);
+}
+}
+}
 console.log(metaDataOverride);
  	
 (function(){
@@ -260,7 +321,7 @@ console.log(metaDataOverride);
 			videoSpeechEngine.start();
 		},
 		stopSpeechRecognition:function(){
-			videoSpeechEngine.abort();
+			//videoSpeechEngine.abort();
 		},
 		sayAfterwards:function() {
 			if("SayAfterVideo" in this.customDataList)
@@ -290,7 +351,7 @@ console.log(metaDataOverride);
 				self.startSpeechRecognition();
 			});
 			this.kdp.addJsListener( 'playerPlayed', function (){
-				self.stopSpeechRecognition();
+				self.startSpeechRecognition();
 			});
 			//alert('metadata length:'+this.kdp.evaluate('{mediaProxy.entryMetadata}').length )
 			//this.metadataLoaded();

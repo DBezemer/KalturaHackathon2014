@@ -1,0 +1,84 @@
+<html>
+<head>
+<!--script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script-->
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script-->
+<!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">-->
+<!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>-->
+<!--<script src="http://cdnapi.kaltura.com/p/1759182/sp/175918200/embedIframeJs/uiconf_id/24617182/partner_id/1759182"></script>-->
+<!--<script src="http://player.kaltura.com/p/1759182/sp/175918200/embedIframeJs/uiconf_id/24705811/partner_id/1759182"></script>-->
+<!--<script src="http://www.kaltura.com/html5/html5lib/v2.10/mwEmbedLoader.php/p/1759182/uiconf_id/24617182"></script>
+<script src="http://player.kaltura.com/kWidget/kWidget.auth.js"></script>
+</head>
+<body>
+<div id="hostedAuthWidget"></div>
+ <script> 
+	//alert('hi');
+	kWidget.auth.getWidget( "hostedAuthWidget", function( userObject ){alert("hello world");})
+</script>
+-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="http://cdnapi.kaltura.com/p/1759182/sp/175918200/embedIframeJs/uiconf_id/24617182/partner_id/1759182"></script>
+<script src="http://cdnapi.kaltura.com/p/1759182/sp/175918200/embedIframeJs/uiconf_id/24617182/partner_id/1759182?entry_id=1_2zri7adb&playerId='ANything'&cache_st=1362074486&autoembed=true&width=400&height=333&"></script>
+
+
+<script src="http://player.kaltura.com/kWidget/kWidget.auth.js"></script>
+<div id="hostedAuthWidget"></div>
+ <script> 
+	kWidget.auth.getWidget( "hostedAuthWidget", function( userObject ){
+		$authTable = $('<table>').css( 'width', '350px' );
+		$.each( userObject, function( key, value){
+			$authTable.append( 
+				$('<tr>').append(
+					$('<td>').text( key ),
+					$('<td>').text( value )
+				)
+			)
+		})
+		$('#hostedAuthWidget').after( 
+			"Got login info: ",
+			$authTable 
+		)
+	})
+</script>
+
+<!--
+function( userObject ){
+	// Create new api object and issue request
+		console.log(userObject);
+		new kWidget.api( {
+			'wid' : '_243342',
+		}).doRequest({
+			'ks': 'djJ8MTc1OTE4MnyEzzg0AoVVKfJ4L2jVWt34iXsqi8SjG9Bapb5nqk_PMX3Wpm-dWk5zg3xkzTWHsYflxijZvUhHAQc-LeS1kutlRfacuQWs8ic0qQ_T3GL0tOaGq6PU0oOKqJc0NeWXgd8=',
+			'service':'metadata_metadata', 
+			'action': 'add', 
+			'objectId': '1_2zri7adb',
+			'xml':'<metadata><TopAngle>45</TopAngle><BottomAngle>135</BottomAngle><LeftAngle>0</LeftAngle><RightAngle>180</RightAngle></metadata>'
+		}, function( data ){
+			// output formatted json result:
+			$('#playlist_result').html( 
+				syntaxHighlight( data )
+			);
+		})
+	}-->
+	
+	
+<!--
+	// Create new api object and issue request
+		console.log(userObject);
+		new kWidget.api( {
+			'wid' : '_243342',
+		}).doRequest({
+			'ks': 'djJ8MTc1OTE4MnyEzzg0AoVVKfJ4L2jVWt34iXsqi8SjG9Bapb5nqk_PMX3Wpm-dWk5zg3xkzTWHsYflxijZvUhHAQc-LeS1kutlRfacuQWs8ic0qQ_T3GL0tOaGq6PU0oOKqJc0NeWXgd8=',
+			'service':'metadata_metadata', 
+			'action': 'add', 
+			'objectId': '1_2zri7adb',
+			'xml':'<metadata><TopAngle>45</TopAngle><BottomAngle>135</BottomAngle><LeftAngle>0</LeftAngle><RightAngle>180</RightAngle></metadata>'
+		}, function( data ){
+			// output formatted json result:
+			console.log('RESULTS:',data);
+		})
+	-->
+</body>
+</html>
