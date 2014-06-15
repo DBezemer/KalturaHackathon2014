@@ -83,6 +83,8 @@ function setUpVideoForTexture()
 
 	videoElement.onloadedmetadata=function(e){
    		videoElement.crossOrigin=""
+//		videoImage.width = videoElement.videoWidth*Math.max(720,videoElement.videoHeight)/videoElement.videoHeight;
+//		videoImage.height = Math.max(720,videoElement.videoHeight);
 		videoImage.width = videoElement.videoWidth;
 		videoImage.height = videoElement.videoHeight;
 		videoImageContext = videoImage.getContext( '2d' );
@@ -99,6 +101,23 @@ function createRenderers()
   // Create render
   try {
     renderer = new THREE.WebGLRenderer({'canvas':canvasElement});
+    
+
+				// postprocessing
+	if(false)
+	{
+				var composer = new THREE.EffectComposer( renderer );
+				composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+				var composerEffect1 = new THREE.ShaderPass( THREE.DotScreenShader );
+				composerEffect1.uniforms[ 'scale' ].value = 4;
+				composerEffect1.addPass( effect );
+
+				var composerEffect2 = new THREE.ShaderPass( THREE.RGBShiftShader );
+				composerEffect2.uniforms[ 'amount' ].value = 0.0015;
+				composerEffect2.renderToScreen = true;
+				composer.addPass( effect );
+	}
   }
   catch(e){
     alert('This application needs WebGL enabled!');
@@ -143,6 +162,10 @@ function initWebGL() {
   var imageTexture=THREE.ImageUtils.loadTexture('/images/panoimage.jpg');
 
 	videoImage = document.createElement( 'canvas' );
+//	var w=videoElement?(videoElement.videoWidth || 1280):1280;
+//	var h=videoElement?(videoElement.videoHeight || 720):720;
+//	videoImage.width = w/h*Math.max(h,720);
+//	videoImage.height = videoElement?(Math.max(h,720) || 1):1;
 	videoImage.width = videoElement?(videoElement.videoWidth || 1):1;
 	videoImage.height = videoElement?(videoElement.videoHeight || 1):1;
 	if(videoElement)
@@ -183,15 +206,16 @@ function initControls() {
   // ---------------------------------------
   var lastSpaceKeyTime = new Date(),
       lastCtrlKeyTime = lastSpaceKeyTime;
-
+      
+//  $(document).off( "keydown" );
   $(document).keydown(function(e) {
     //console.log(e.keyCode);
     switch(e.keyCode) {
       case 32: // Space
         var spaceKeyTime = new Date();
-        if (spaceKeyTime-lastSpaceKeyTime < 300) {
-          $('.ui').toggle(200);
-        }
+        //if (spaceKeyTime-lastSpaceKeyTime < 300) {
+        //  $('.ui').toggle(200);
+        //}
         lastSpaceKeyTime = spaceKeyTime;
         break;
       case 37: case 65:
@@ -211,6 +235,7 @@ function initControls() {
         if (ctrlKeyTime-lastCtrlKeyTime < 300) {
           doMoveAction();
         }
+       
         lastCtrlKeyTime = ctrlKeyTime;
         break;
       case 18: // Alt
@@ -220,6 +245,7 @@ function initControls() {
     }
   });
 
+  //$(document).off( "keyup" );
   $(document).keyup(function(e) {
     switch(e.keyCode) {
       case 37:case 65:
@@ -233,6 +259,11 @@ function initControls() {
       case 82:
       	USE_RIFT=!USE_RIFT;
       	break;
+      case 32: //space
+      	break;
+      case 13,90:
+        doMoveAction();
+        break;
     }
   });
 
@@ -388,7 +419,15 @@ function initWebSocket() {
 
 
 function doMoveAction() {
-	console.log('Move Action!')
+	console.log('Start listening!')
+	
+        //videoSpeechEngine.start();
+        //Send a message to parent frame to start speech recognition
+        if(window.targetElementForOSV)
+        {
+        	targetElementForOSV.sendNotification("doStop");
+        }
+        parent.postMessage("TurnOnSpeechRecognition","*");
 }
 
 function initVR() {
@@ -445,6 +484,64 @@ function resize( event ) {
   renderer.setSize( WIDTH, HEIGHT );
   camera.projectionMatrix.makePerspective( 60, WIDTH /HEIGHT, 1, 1100 );
 }
+/// sharpen image:
+/// from http://jsfiddle.net/AbdiasSoftware/ddJZB/
+/// USAGE:
+///    sharpen(context, width, height, mixFactor)
+///  mixFactor: [0.0, 1.0]
+function sharpen(ctx, w, h, mix) {
+
+    var weights = [0, -1, 0, -1, 5, -1, 0, -1, 0],
+        katet = Math.round(Math.sqrt(weights.length)),
+        half = (katet * 0.5) | 0;
+        console.log('sharpen', ctx, w, h, mix);
+    var dstData = ctx.createImageData(w, h),
+        dstBuff = dstData.data,
+        srcBuff = ctx.getImageData(0, 0, w, h).data,
+        y = h;
+
+    while (y--) {
+
+        x = w;
+
+        while (x--) {
+
+            var sy = y,
+                sx = x,
+                dstOff = (y * w + x) * 4,
+                r = 0,
+                g = 0,
+                b = 0,
+                a = 0;
+
+            for (var cy = 0; cy < katet; cy++) {
+                for (var cx = 0; cx < katet; cx++) {
+
+                    var scy = sy + cy - half;
+                    var scx = sx + cx - half;
+
+                    if (scy >= 0 && scy < h && scx >= 0 && scx < w) {
+
+                        var srcOff = (scy * w + scx) * 4;
+                        var wt = weights[cy * katet + cx];
+
+                        r += srcBuff[srcOff] * wt;
+                        g += srcBuff[srcOff + 1] * wt;
+                        b += srcBuff[srcOff + 2] * wt;
+                        a += srcBuff[srcOff + 3] * wt;
+                    }
+                }
+            }
+
+            dstBuff[dstOff] = r * mix + srcBuff[dstOff] * (1 - mix);
+            dstBuff[dstOff + 1] = g * mix + srcBuff[dstOff + 1] * (1 - mix);
+            dstBuff[dstOff + 2] = b * mix + srcBuff[dstOff + 2] * (1 - mix)
+            dstBuff[dstOff + 3] = srcBuff[dstOff + 3];
+        }
+    }
+	console.log('sharpened');
+    ctx.putImageData(dstData, 0, 0);
+}
 
 function loop() {
   requestAnimationFrame( loop );
@@ -466,7 +563,7 @@ function loop() {
     	var x=parseFloat(HEAD_LOCATION.x);
     	var y=parseFloat(HEAD_LOCATION.y);
     	var z=parseFloat(HEAD_LOCATION.z);
-    	var headEuler=new THREE.Euler( Math.sin(-y/z), Math.sin(x/z), 0, 'XYZ' );
+    	var headEuler=new THREE.Euler( Math.sin(-y/z), Math.sin(x/z), 0, 'YZX' );
     	//console.log(headEuler);
     	HMDRotation.setFromEuler(headEuler);
     }
@@ -500,6 +597,7 @@ function loop() {
 			Math.max(0.0,Math.min(videoImage.height, (1.0-video_bottom_angle/180.0)*videoImage.height)),
 			Math.max(0.0,Math.min(videoImage.width, (video_right_angle-video_left_angle)/360.0*videoImage.width)), 
 			Math.max(0.0,Math.min(videoImage.height, (video_bottom_angle-video_top_angle)/180.0*videoImage.height)) );
+		//sharpen(videoImageContext, videoImage.width, videoImage.height, 1.0) ;
 		//console.log('drew image');
 		if ( videoTexture ) 
 		{

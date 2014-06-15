@@ -77,6 +77,8 @@ document.addEventListener('headtrackrStatus', handleheadtrackrStatusEvent, true)
   	}
   	
   	loadjscssfiles(['js/headtrackr.js'],'js',startHeadtrackr);
+  	
+	loadjscssfiles(['js/speechEngine.js'],'js');
  
 KalturaOfficeInfo= {"1_6mjnzjx1": "Kaltura Kitchen",
 "1_crrvzz9n": "Kaltura Server Room",
@@ -85,25 +87,14 @@ KalturaOfficeInfo= {"1_6mjnzjx1": "Kaltura Kitchen",
 "1_n8m3w8y2": "Meeting Room with Windows",
 "1_wmsowqoo": "Kaltura Lobby",
 "1_9seq8pkw": "Kaltura Elevators",
-"1_11gu6jks": "Bicycle video"};
+"1_11gu6jks": "Bicycle video",
+"1_ynznt8o3": "Friday night at the hackathon"};
 
 var metaDataOverride={}
 
 OVERRIDE_METADATA=false;
 if(OVERRIDE_METADATA)
 {
-metaDataOverride={"1_ynznt8o3":{
-				"TopAngle": "45", //"45",
-				"BottomAngle": "135", //"135",
-				"LeftAngle": "0",
-				"RightAngle": "360",
-				"SayAfterVideo": "Please tell me where you want to go next",
-				"backgroundImage":"",
-				"SpeechPattern": [JSON.stringify({"regex":"bike","goto":"1_11gu6jks"}), 
-									JSON.stringify({"regex":"bicycle","goto":"1_11gu6jks"}),
-									JSON.stringify({"regex":"next","goto":"0_yk83ppmr","say":"going to next video"})],
-				}
-			};
 			
 for(k in KalturaOfficeInfo)
 {
@@ -143,8 +134,8 @@ kwidgetAPI=new kWidget.api( {
 			'wid' : '_243342',
 		});
 //Find the KS secret by logging in at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html
-KS_DO_NOT_SAVE_IN_CODE='THIS IS A BOGUS KS CODE. http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html'
-alert('KS secret is bogus. Code will fail');
+KS_DO_NOT_SAVE_IN_CODE='THIS IS A BOGUS KS CODE. Get the real code at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html'
+alert('KS secret is bogus. Code will fail. Get the real code at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html');
 for(var k in metaDataOverride)
 {
 	var xmlResults='<metadata><TopAngle>'+metaDataOverride[k].TopAngle+'</TopAngle><BottomAngle>'+metaDataOverride[k].BottomAngle+'</BottomAngle>';
@@ -229,11 +220,20 @@ console.log(metaDataOverride);
 				videoSpeechEngine.abort();
 				msg.onend = function(e) {
 							//Within iframe use currentState;
-					videoSpeechEngine.start();
+					//videoSpeechEngine.start();
   							//console.log('Finished in ' + event.elapsedTime + ' seconds.');
 				};
 
 				window.speechSynthesis.speak(msg);
+		},
+		startLoadSpeechCommands:function(){
+			self=this;
+			if(window.videoSpeechEngine)
+			{
+				self.loadSpeechCommands();
+			} else {
+				loadjscssfiles(['js/speechEngine.js'],'js', function(){self.loadSpeechCommands()});
+			};
 		},
 		loadSpeechCommands:function(){
 			var self=this;
@@ -269,7 +269,10 @@ console.log(metaDataOverride);
   				if('SpeechPattern' in this.customDataList)
   				{
   					var speechPatterns=this.customDataList.SpeechPattern;
-  					if( !(length in speechPatterns))
+  					if (typeof speechPatterns == 'string' || speechPatterns instanceof String)
+  						speechPatterns=JSON.parse(speechPatterns);
+
+  					if( !('length' in speechPatterns))
   					{
   						speechPatterns=[speechPatterns];
   					}
@@ -312,7 +315,7 @@ console.log(metaDataOverride);
 			this.iframe.contentWindow.postMessage(JSON.stringify({'metaData':this.customDataList}), "*");
 			//console.log('loadjscssfiles: ', loadjscssfiles);
 			var self=this;
-			loadjscssfiles(['js/speechEngine.js'],'js', function(){self.loadSpeechCommands()});
+			self.startLoadSpeechCommands();
 			//$.each( customDataList, function( key, val ){
 			//	console.log('metadata key: ',key, ', metadata value: ', val );
 			//})
@@ -321,7 +324,7 @@ console.log(metaDataOverride);
 			videoSpeechEngine.start();
 		},
 		stopSpeechRecognition:function(){
-			//videoSpeechEngine.abort();
+			videoSpeechEngine.abort();
 		},
 		sayAfterwards:function() {
 			if("SayAfterVideo" in this.customDataList)
@@ -330,7 +333,7 @@ console.log(metaDataOverride);
 				this.say(this.customDataList.SayAfterVideo);
 			} else
 			{
-				videoSpeechEngine.start();
+				//videoSpeechEngine.start();
 			}
 		},
 		addPlayerBindings:function(){
@@ -348,10 +351,10 @@ console.log(metaDataOverride);
 				self.sayAfterwards();
 			});
 			this.kdp.addJsListener( 'playerPaused', function (){
-				self.startSpeechRecognition();
+				//self.startSpeechRecognition();
 			});
 			this.kdp.addJsListener( 'playerPlayed', function (){
-				self.startSpeechRecognition();
+				//self.startSpeechRecognition();
 			});
 			//alert('metadata length:'+this.kdp.evaluate('{mediaProxy.entryMetadata}').length )
 			//this.metadataLoaded();

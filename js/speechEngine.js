@@ -9,6 +9,13 @@
 
   // Save a reference to the global object (window in the browser)
   var root = this;
+  
+  window.addEventListener("message",function(e) {
+    console.log('speech engine received message!:  ',e.data);
+    if(e.data=="TurnOnSpeechRecognition")
+    	root.videoSpeechEngine.start()
+  });
+
 
   // Get the SpeechRecognition object, while handling browser prefixes
   var SpeechRecognition = root.SpeechRecognition ||
@@ -153,6 +160,16 @@
                 }
               }
               // execute the matched command
+              this.abort();
+              var self=this;
+            var textToSay = "Your request "+results[0].transcript.trim() + "was understood";
+			var msg = new SpeechSynthesisUtterance(textToSay);
+			msg.onend = function(e) {
+              self.abort();
+							//Within iframe use currentState;
+  							//console.log('Finished in ' + event.elapsedTime + ' seconds.');
+			};
+			window.speechSynthesis.speak(msg);	
               commandsList[j].callback.apply(this, parameters);
               invokeCallbacks(callbacks.resultMatch);
               return true;
@@ -162,12 +179,12 @@
         if(results.length>0)
         {
         	this.abort();
-        	self=this;
-            var textToSay = "I thought you said "+results[0].transcript.trim()+", but I couldn't understand it.";
+        	var self=this;
+            var textToSay = "Your request "+results[0].transcript.trim() + "was not understood";
 			var msg = new SpeechSynthesisUtterance(textToSay);
 			msg.onend = function(e) {
 							//Within iframe use currentState;
-					self.start();
+					self.abort();
   							//console.log('Finished in ' + event.elapsedTime + ' seconds.');
 			};
 			window.speechSynthesis.speak(msg);	
@@ -195,7 +212,7 @@
       if (options.autoRestart !== undefined) {
         autoRestart = !!options.autoRestart;
       } else {
-        autoRestart = true;
+        autoRestart = false;
       }
       lastStartedAt = new Date().getTime();
       try{
