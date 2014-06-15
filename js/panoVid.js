@@ -89,8 +89,10 @@ function setUpVideoForTexture()
 		videoImage.height = videoElement.videoHeight;
 		videoImageContext = videoImage.getContext( '2d' );
 		
-    	videoImageContext.translate( videoImage.width, 0 );
+    	//videoImageContext.translate( videoImage.width, 0 );
+	    videoImageContext.translate(videoImage.width / 2, videoImage.height / 2);
     	videoImageContext.scale(-1, 1);
+    	videoImageContext.translate(-videoImage.width / 2, -videoImage.height / 2);
 		// background color if no video present
 		videoImageContext.fillStyle = '#808080';
 		videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
@@ -177,8 +179,10 @@ function initWebGL() {
 	};
 	
 	videoImageContext = videoImage.getContext( '2d' );
-    	videoImageContext.scale(-1, 1);
-    	videoImageContext.translate( -videoImage.width / 2, -videoImage.height  / 2 );
+    //videoImage.translate(videoImage.width / 2, videoImage.height / 2);
+    //videoImageContext.scale(-1, 1);
+    //videoImage.translate(-videoImage.width / 2, -videoImage.height / 2);
+    	//videoImageContext.translate( -videoImage.width / 2, -videoImage.height  / 2 );
 	// background color if no video present
 	videoImageContext.fillStyle = '#808080';
 	videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
