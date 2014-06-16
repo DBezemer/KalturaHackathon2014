@@ -1,4 +1,14 @@
-
+var uaIndex=navigator.userAgent.search('Chrome/');
+if(uaIndex<0 || parseInt(navigator.userAgent.substring(uaIndex+7).split('.')[0])<35)
+{
+	alert('Unsupported browser ('+navigator.userAgent+').\n'+
+			 'This plugin currently only supports the latest releases of Google Chrome.\n'+
+			 'Please upgrade to the latest Dev or Canary versions (at least version 35) of Google Chrome.\n'+
+			 'The panoramic addin has been disabled. You will see the panoramic source video streaming\n'+
+			 'in the unmodified Kaltura player');
+}
+else
+{
 	//Function from http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
 	var loadjscssfiles=function (filenames, filetype, callback){
 		callback=callback||function(){};
@@ -32,7 +42,7 @@
 	};
 	
 function handleheadtrackrStatusEvent(event) {
-    console.log(event.status);
+    //console.log(event.status);
 }
 
 function handleFaceTrackingEvent(e){
@@ -379,3 +389,4 @@ console.log(metaDataOverride);
 		}
 	}
 })();
+}

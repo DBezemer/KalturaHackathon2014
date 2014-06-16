@@ -90,9 +90,9 @@ function setUpVideoForTexture()
 		videoImageContext = videoImage.getContext( '2d' );
 		
     	//videoImageContext.translate( videoImage.width, 0 );
-	    videoImageContext.translate(videoImage.width / 2, videoImage.height / 2);
-    	videoImageContext.scale(-1, 1);
-    	videoImageContext.translate(-videoImage.width / 2, -videoImage.height / 2);
+	    //videoImageContext.translate(videoImage.width / 2, videoImage.height / 2);
+    	//videoImageContext.scale(-1, 1);
+    	//videoImageContext.translate(-videoImage.width / 2, -videoImage.height / 2);
 		// background color if no video present
 		videoImageContext.fillStyle = '#808080';
 		videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
@@ -192,8 +192,15 @@ function initWebGL() {
 	videoTexture.magFilter = THREE.LinearFilter;
 	
 	videoMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
-  projSphere = new THREE.Mesh( new THREE.SphereGeometry( 500, 32, 32 ), videoMaterial );
-  projSphere.geometry.dynamic = true;
+	var sphereGeom = new THREE.SphereGeometry( 500, 16, 16 );
+  
+	for (var index = 0; index < sphereGeom.faceVertexUvs[0].length; ++index) {
+		for (var vertex = 0; vertex < 3; ++vertex) {
+			sphereGeom.faceVertexUvs[0][index][vertex].x = 1.0-sphereGeom.faceVertexUvs[0][index][vertex].x;
+		}
+	}
+  sphereGeom.dynamic = false; //We aren't doing depth mapping, geometry won't change
+    projSphere = new THREE.Mesh( sphereGeom, videoMaterial );
   //projSphere.useQuaternion = true; //No longer needed
   scene.add( projSphere );
 
