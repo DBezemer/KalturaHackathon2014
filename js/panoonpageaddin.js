@@ -66,6 +66,10 @@ var htracker;
 
 	function startHeadtrackr()
 	{
+		try{
+			if(htracker)
+				htracker.stop();
+		} catch(e){}
 		htCanvas=document.createElement('canvas');
 		htCanvas.id='headtrackrCanvas';
 		htCanvas.width=320;
@@ -91,13 +95,17 @@ var htracker;
   		}
   	}
   	
+  var videoHeadTracking={};
+  videoHeadTracking.start=startHeadtrackr;
+  	
   	
   
   window.addEventListener("message",function(e) {
     if(e.data=="TurnOffHeadTracking")
     {
     	try{
-	    	htracker.stop();
+    		if(htracker)
+		    	htracker.stop();
 	    } catch(e)
 	    {
 	    	console.log('Exception stopping head tracking: ', e);
@@ -105,7 +113,7 @@ var htracker;
 	}
   });
   	
-  	loadjscssfiles(['js/headtrackr.js'],'js',startHeadtrackr);
+  	loadjscssfiles(['js/headtrackr.js'],'js');
   	
 	loadjscssfiles(['js/speechEngine.js'],'js');
  

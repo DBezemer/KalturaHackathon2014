@@ -51,6 +51,7 @@ kWidget.embed({
 This website is statically hosted! Thanks to Kaltura, no back end coding is needed at all! 
 <p>
 <button onClick="if(window.videoSpeechEngine) videoSpeechEngine.start();">Start Speech Recognition</button>
+<button onClick="if(window.videoHeadTracking) videoHeadTracking.start();">Start Head Tracking</button>
 <p>
 Suggestions for speech recognition: suggest that you want to visit the window, kitchen, or server room...
 <p>
@@ -67,12 +68,17 @@ Please allow the website to access your camera if you want to see head tracking 
    <li> The thumbnails are still usable (untransformed panoramic images) </li>
    <li> You can navigate with the "W" (up) "A" (left) "S" (right) and "D" (down) keys. </li>
    <li> Supports webcam based headtracking for changing perspective! </li>
+   <li> For computers with gyroscopes, change orientation with the gyroscope.</li>
    <li> Expands to two full screen views. A regular full screen view and a Oculus RIft full screen view with full head tracking (requires the <a href="https://github.com/benvanik/vr.js/tree/master">vr.js</a> browser plugin)!</li>
    <li> Supports speech recognition! Navigate between pages by using web speech recognition. Speech recognition is initiated by pressing the "z" key.</li>
    <li> Speech commands are Kaltura metadata which can be edited using the mediaspace API.</li>
    <li> Add a speech recognition button to the web page with this line of html:
 		<blockquote>
 			&lt;button onClick=&quot;if(window.videoSpeechEngine) videoSpeechEngine.start();&quot;&gt;Start Speech Recognition&lt;/button&gt;
+		</blockquote>
+	</li><li> Add a head tracking button to the web page with this line of html:
+		<blockquote>
+			&lt;button onClick=&quot;if(window.videoHeadTracking) videoHeadTracking.start();&quot;&gt;Start Speech Recognition&lt;/button&gt;
 		</blockquote>
 	</li>
 </div>
