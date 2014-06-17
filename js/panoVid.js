@@ -56,7 +56,14 @@ var BaseRotation = new THREE.Quaternion();
 var BaseRotationEuler = new THREE.Euler();
 var LeapRotation = new THREE.Quaternion();
 var LeapRotationEuler = new THREE.Euler();
+var HeadRotation = new THREE.Quaternion();
+var HeadEuler = new THREE.Euler();
+var GyroRotation = new THREE.Quaternion();
+var GyroRotationEuler = new THREE.Euler();
+
+var GyroRotationEulerInitial;
 var TempRotation = new THREE.Quaternion();
+
 
 var VRState = null;
 
@@ -72,6 +79,44 @@ var leapYMeanReversion=0.0;
 var leapXBase=0.0;
 var leapXBaseAdj=0.8;
 
+function deviceOrientationHandler(gamma, beta, alpha)
+{
+	rotationOrder='XYZ'; //'YXZ'
+	if(!GyroRotationEulerInitial)
+		GyroRotationEulerInitial=new THREE.Euler(alpha*Math.PI/180.0, -beta*Math.PI/180.0, gamma*Math.PI/180.0, rotationOrder );
+	x=new THREE.Quaternion();
+	x.setFromEuler(GyroRotationEulerInitial);
+	GyroRotationEuler.set(alpha*Math.PI/180.0, 
+							-beta*Math.PI/180.0, 
+							gamma*Math.PI/180.0, rotationOrder );
+    y=new THREE.Quaternion();
+	y.setFromEuler(GyroRotationEuler);
+	z=x.inverse();
+	q=y.multiply(z);
+	GyroRotationEuler.setFromQuaternion(q);
+	
+}	
+
+if (window.DeviceOrientationEvent) {
+	// Listen for the deviceorientation event and handle the raw data
+	window.addEventListener('deviceorientation', function(eventData) {
+	  // gamma is the left-to-right tilt in degrees, where right is positive
+  var tiltLR = eventData.gamma;
+  
+  // beta is the front-to-back tilt in degrees, where front is positive
+  var tiltFB = eventData.beta;
+  
+  // alpha is the compass direction the device is facing in degrees
+  var dir = eventData.alpha
+  
+  // call our orientation event handler
+  deviceOrientationHandler(tiltLR, tiltFB, dir);
+}, false);
+} else alert('No DeviceOrientationEvent available');
+
+
+	  
+		  
 // Utility function
 // ----------------------------------------------
 function angleRangeDeg(angle) {
@@ -590,14 +635,19 @@ function loop() {
   }
     if (USE_RIFT && ps) {
       HMDRotation.set(VRState.hmd.rotation[0], VRState.hmd.rotation[1], VRState.hmd.rotation[2], VRState.hmd.rotation[3]);
-    } else if(HEAD_LOCATION && !usingLeap)
+    } else if(!usingLeap)
     {
+		if(HEAD_LOCATION)
+		{
     	var x=parseFloat(HEAD_LOCATION.x);
     	var y=parseFloat(HEAD_LOCATION.y);
     	var z=parseFloat(HEAD_LOCATION.z);
-    	var headEuler=new THREE.Euler( Math.sin(-y/z), Math.sin(x/z), 0, 'YZX' );
+    	HeadEuler.set( Math.sin(-y/z), Math.sin(x/z), 0, 'YZX' );
+		}
+    	HeadRotation.setFromEuler(HeadEuler);
+		GyroRotation.setFromEuler(GyroRotationEuler);
+		HMDRotation.multiplyQuaternions(GyroRotation, HeadRotation);
     	//console.log(headEuler);
-    	HMDRotation.setFromEuler(headEuler);
     }
 
   // Compute move vector
