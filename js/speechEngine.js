@@ -143,7 +143,7 @@
         // go over each of the 5 results and alternative results received (we've set maxAlternatives to 5 above)
         for (var i = 0; i<results.length; i++) {
           // the text recognized
-          commandText = results[i].transcript.trim();
+          commandText = results[i].transcript.trim().toLowerCase();
           if (debugState) {
             root.console.log('Speech recognized: %c'+commandText, debugStyle);
           }

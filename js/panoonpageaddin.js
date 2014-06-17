@@ -66,10 +66,6 @@ var htracker;
 
 	function startHeadtrackr()
 	{
-		try{
-			if(htracker)
-				htracker.stop();
-		} catch(e){}
 		htCanvas=document.createElement('canvas');
 		htCanvas.id='headtrackrCanvas';
 		htCanvas.width=320;
@@ -95,17 +91,13 @@ var htracker;
   		}
   	}
   	
-  var videoHeadTracking={};
-  videoHeadTracking.start=startHeadtrackr;
-  	
   	
   
   window.addEventListener("message",function(e) {
     if(e.data=="TurnOffHeadTracking")
     {
     	try{
-    		if(htracker)
-		    	htracker.stop();
+	    	htracker.stop();
 	    } catch(e)
 	    {
 	    	console.log('Exception stopping head tracking: ', e);
@@ -113,10 +105,11 @@ var htracker;
 	}
   });
   	
-  	loadjscssfiles(['js/headtrackr.js'],'js');
+  	loadjscssfiles(['js/headtrackr.js'],'js',startHeadtrackr);
   	
 	loadjscssfiles(['js/speechEngine.js'],'js');
- 
+
+/* 
 KalturaOfficeInfo= {"1_6mjnzjx1": "Kaltura Kitchen",
 "1_crrvzz9n": "Kaltura Server Room",
 "1_2zri7adb": "Main Office Area",
@@ -171,8 +164,53 @@ metaDataOverride["1_11gu6jks"].TopAngle="0";
 metaDataOverride["1_11gu6jks"].BottomAngle="180"; 
 metaDataOverride["1_eoff36sk"].TopAngle="0";
 metaDataOverride["1_eoff36sk"].BottomAngle="180"; 
+*/
 
-var DO_METADATA_UPDATE=true
+KalturaDemoVideos= {"1_mhu02zpt": "Video courtesy of 360 Heros", //Sundance
+"1_vckj4wvb": "Video courtesy of 360 Heros", //Drone
+"1_dld4vkhe": "Video courtesy of 360 Heros", //Sharks
+"1_2z7caelb": "Video courtesy of 360 Heros", //Scuba
+"1_eoff36sk": "Video courtesy of Giroptic", //France
+"1_crrvzz9n": "Video taken on an iphone with a GoPano attachment"};
+
+var metaDataOverride={}
+
+OVERRIDE_METADATA=true;
+if(OVERRIDE_METADATA)
+{
+			
+for(k in KalturaDemoVideos)
+{
+	metaDataOverride[k]={
+				"TopAngle": "0", //"45",
+				"BottomAngle": "180", //"135",
+				"LeftAngle": "0",
+				"RightAngle": "360",
+				"SayAfterVideo": KalturaDemoVideos[k],
+				"backgroundImage":"",
+				"SpeechPattern": [JSON.stringify({"regex":"sundance","goto":"1_mhu02zpt"}), 
+									JSON.stringify({"regex":"film","goto":"1_mhu02zpt"}),
+									JSON.stringify({"regex":"festival","goto":"1_mhu02zpt"}),
+									JSON.stringify({"regex":"drone","goto":"1_vckj4wvb"}),
+									JSON.stringify({"regex":"quadcopter","goto":"1_vckj4wvb"}),
+									JSON.stringify({"regex":"helicopter","goto":"1_vckj4wvb"}),
+									JSON.stringify({"regex":"flying","goto":"1_vckj4wvb"}),
+									JSON.stringify({"regex":"flight","goto":"1_vckj4wvb"}),
+									JSON.stringify({"regex":"scuba","goto":"1_2z7caelb"}),
+									JSON.stringify({"regex":"diving","goto":"1_2z7caelb"}),
+									JSON.stringify({"regex":"underwater","goto":"1_2z7caelb"}),
+									JSON.stringify({"regex":"shark","goto":"1_dld4vkhe"}),
+									JSON.stringify({"regex":"france","goto":"1_eoff36sk"}),
+									JSON.stringify({"regex":"paris","goto":"1_eoff36sk"}),
+									JSON.stringify({"regex":"kaltura","goto":"1_crrvzz9n"}),
+									JSON.stringify({"regex":"gopano","goto":"1_crrvzz9n"}),
+									JSON.stringify({"regex":"iphone","goto":"1_crrvzz9n"}),],
+				}
+}
+metaDataOverride["1_crrvzz9n"].TopAngle="45";
+metaDataOverride["1_crrvzz9n"].BottomAngle="135"; 
+
+var DO_METADATA_UPDATE=false
 if(DO_METADATA_UPDATE)
 {
 kwidgetAPI=new kWidget.api( {
