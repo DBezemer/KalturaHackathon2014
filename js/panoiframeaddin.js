@@ -51,14 +51,14 @@ var video_right_angle=360;
   		}
 	}
 	
+	function runIfNeeded(){
+		if(ALL_JS_LOADED) return;
+		ALL_JS_LOADED=true;
+		startPanoWrapper();
+	}
 		//loadjscssfiles(['js/jquery-ui.min.js','js/jquery.base64.min.js','js/zpipe.min.js','js/three.js','js/RequestAnimationFrame.js','js/gamepad.js','js/vr.js','js/OculusRiftEffect.js','js/panoVid.js'],'js', runIfNeeded);
 	loadjscssfiles(['js/three.js','js/RequestAnimationFrame.js','js/gamepad.js','js/vr.js',
-						"js/shaders/CopyShader.js","js/shaders/DotScreenShader.js",
-						"js/shaders/RGBShiftShader.js","js/postprocessing/EffectComposer.js",
-						"js/postprocessing/RenderPass.js",
-						"js/postprocessing/MaskPass.js",
-						"js/postprocessing/ShaderPass.js",
-						'js/OculusRiftEffect.js','js/panoVid.js'],'js', runIfNeeded);
+						'js/OculusRiftEffect.js',"//js.leapmotion.com/leap-0.5.0.min.js",'js/panoVid.js'],'js', runIfNeeded);
 	
 
 
@@ -80,11 +80,6 @@ var video_right_angle=360;
   			loadjscssfile("js/stemkowski.js",'js');
   			*/
   		
-	function runIfNeeded(){
-		if(ALL_JS_LOADED) return;
-		ALL_JS_LOADED=true;
-		startPanoWrapper();
-	}
 	
 	function testMetaData(){
 				embedPlayer=targetElementForOSV;
@@ -118,7 +113,7 @@ var video_right_angle=360;
 		canvasElement.style.zIndex="1000";
 		canvasElement.autofocus="true";
 		canvasElement.id='customRenderingCanvas';
-		videoElement.parentNode.insertBefore(canvasElement,videoElement);
+		videoElement.parentElement.insertBefore(canvasElement,videoElement);
 		
 		if(window.setUpVideoForTexture)
 			setUpVideoForTexture();

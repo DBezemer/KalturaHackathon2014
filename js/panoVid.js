@@ -37,6 +37,9 @@ var OculusRift = {
 
 var videoImage, videoImageContext, videoTexture, videoMaterial;
 
+var renderer;
+var effect;
+
 // Globals
 // ----------------------------------------------
 var WIDTH, HEIGHT;
@@ -51,8 +54,23 @@ var gamepadMoveVector = new THREE.Vector3();
 var HMDRotation = new THREE.Quaternion();
 var BaseRotation = new THREE.Quaternion();
 var BaseRotationEuler = new THREE.Euler();
+var LeapRotation = new THREE.Quaternion();
+var LeapRotationEuler = new THREE.Euler();
+var TempRotation = new THREE.Quaternion();
 
 var VRState = null;
+
+var LeapController;
+var firstValidLeapFrame; //first valid leap motion frame
+var lastLeapTime;
+var LEAP_X_SCALE=1;
+var LEAP_Y_SCALE=0.5;
+var leapXAdjustment=0.0;
+var leapYAdjustment=0.0;
+var leapXMeanReversion=0.0;
+var leapYMeanReversion=0.0;
+var leapXBase=0.0;
+var leapXBaseAdj=0.8;
 
 // Utility function
 // ----------------------------------------------
@@ -165,8 +183,16 @@ function initWebGL() {
   // Add projection sphere
   
   var imageTexture=THREE.ImageUtils.loadTexture('/images/panoimage.jpg');
-
-	videoImage = document.createElement( 'canvas' );
+ 	
+ 	var VIDEO_IMAGE_ID='videoCanvasForSampling';
+	videoImage= document.getElementById(VIDEO_IMAGE_ID)
+	if(!videoImage)
+	{
+		videoImage = document.createElement( 'canvas' );
+		videoImage.id=VIDEO_IMAGE_ID;
+		videoImage.style.visibility='hidden';
+		document.body.appendChild(videoImage);
+	}
 //	var w=videoElement?(videoElement.videoWidth || 1280):1280;
 //	var h=videoElement?(videoElement.videoHeight || 720):720;
 //	videoImage.width = w/h*Math.max(h,720);
@@ -476,7 +502,7 @@ function initVR() {
 }
 
 function render() {
-	if(renderer.domElement!=canvasElement)
+	if(renderer.domElement!=canvasElement) // || !videoImage || videoImage.width==0 || videoImage.height==0)
 		initWebGL();
 		
   	if(USE_RIFT)
@@ -500,67 +526,57 @@ function resize( event ) {
   renderer.setSize( WIDTH, HEIGHT );
   camera.projectionMatrix.makePerspective( 60, WIDTH /HEIGHT, 1, 1100 );
 }
-/// sharpen image:
-/// from http://jsfiddle.net/AbdiasSoftware/ddJZB/
-/// USAGE:
-///    sharpen(context, width, height, mixFactor)
-///  mixFactor: [0.0, 1.0]
-function sharpen(ctx, w, h, mix) {
-
-    var weights = [0, -1, 0, -1, 5, -1, 0, -1, 0],
-        katet = Math.round(Math.sqrt(weights.length)),
-        half = (katet * 0.5) | 0;
-        console.log('sharpen', ctx, w, h, mix);
-    var dstData = ctx.createImageData(w, h),
-        dstBuff = dstData.data,
-        srcBuff = ctx.getImageData(0, 0, w, h).data,
-        y = h;
-
-    while (y--) {
-
-        x = w;
-
-        while (x--) {
-
-            var sy = y,
-                sx = x,
-                dstOff = (y * w + x) * 4,
-                r = 0,
-                g = 0,
-                b = 0,
-                a = 0;
-
-            for (var cy = 0; cy < katet; cy++) {
-                for (var cx = 0; cx < katet; cx++) {
-
-                    var scy = sy + cy - half;
-                    var scx = sx + cx - half;
-
-                    if (scy >= 0 && scy < h && scx >= 0 && scx < w) {
-
-                        var srcOff = (scy * w + scx) * 4;
-                        var wt = weights[cy * katet + cx];
-
-                        r += srcBuff[srcOff] * wt;
-                        g += srcBuff[srcOff + 1] * wt;
-                        b += srcBuff[srcOff + 2] * wt;
-                        a += srcBuff[srcOff + 3] * wt;
-                    }
-                }
-            }
-
-            dstBuff[dstOff] = r * mix + srcBuff[dstOff] * (1 - mix);
-            dstBuff[dstOff + 1] = g * mix + srcBuff[dstOff + 1] * (1 - mix);
-            dstBuff[dstOff + 2] = b * mix + srcBuff[dstOff + 2] * (1 - mix)
-            dstBuff[dstOff + 3] = srcBuff[dstOff + 3];
-        }
-    }
-	console.log('sharpened');
-    ctx.putImageData(dstData, 0, 0);
-}
-
+      
 function loop() {
   requestAnimationFrame( loop );
+  
+    if(!LeapController) LeapController=new Leap.Controller();
+    if(!LeapController.connected()) LeapController.connect()
+    
+    var usingLeap=false;
+    if(LeapController.connected()){
+    	var frame=LeapController.frame();
+        if (frame.valid) {
+          if (!firstValidLeapFrame)
+          	{
+ 		       parent.postMessage("TurnOffHeadTracking","*");
+          		firstValidLeapFrame = frame;
+          		leapXAdjustment=0.0;
+          		leapYAdjustment=0.0;
+          		lastLeapTime=frame.timestamp;
+          		setInterval(function(){
+          			var frame=LeapController.frame();
+          			if (frame.valid)
+		          		firstValidLeapFrame=frame;
+		        	}, 10000);
+          	}
+          var t = firstValidLeapFrame.translation(frame)
+          //console.log('Leap Frame:', t, frame);
+          
+			var xAngle= -LEAP_X_SCALE*(t[0]-leapXBase)*Math.PI/180.0;
+			var yAngle= LEAP_Y_SCALE*t[1]*Math.PI/180.0;
+			var timeDelta=(frame.timestamp-lastLeapTime)/1000000.0;
+			lastLeapTime=frame.timestamp;
+			leapXAdjustment=(leapXAdjustment+xAngle*0.15*timeDelta);
+			
+			//var adj=Math.pow(0.5,timeDelta);
+			//leapXBase=leapXBase*adj+(t[0]-leapXBase)*(1-adj);
+			//leapYAdjustment=(Math.max(-Math.PI*0.5,Math.min(Math.PI*0.5,leapYAdjustment))+yAngle*0.05)*Math.pow(0.9, timeDelta);
+          LeapRotationEuler.set(0,leapXAdjustment, 0.0, 'YZX' );
+          usingLeap=true;
+
+        }
+        else
+        {
+	        LeapRotationEuler.set( 0.0, 0.0, 0.0, 'YZX' );
+        }
+    }
+    else
+    {
+	        LeapRotationEuler.set( 0.0, 0.0, 0.0, 'YZX' );
+    }
+    LeapRotation.setFromEuler(LeapRotationEuler);
+
 
   	ps=null;
   // User vr plugin
@@ -574,7 +590,7 @@ function loop() {
   }
     if (USE_RIFT && ps) {
       HMDRotation.set(VRState.hmd.rotation[0], VRState.hmd.rotation[1], VRState.hmd.rotation[2], VRState.hmd.rotation[3]);
-    } else if(HEAD_LOCATION)
+    } else if(HEAD_LOCATION && !usingLeap)
     {
     	var x=parseFloat(HEAD_LOCATION.x);
     	var y=parseFloat(HEAD_LOCATION.y);
@@ -597,7 +613,8 @@ function loop() {
   BaseRotation.setFromEuler(BaseRotationEuler);
 
   // Update camera rotation
-  camera.quaternion.multiplyQuaternions(BaseRotation, HMDRotation);
+  TempRotation.multiplyQuaternions(LeapRotation, HMDRotation);
+  camera.quaternion.multiplyQuaternions(TempRotation, BaseRotation);
 
   // Compute heading
   headingEuler.setFromQuaternion(camera.quaternion, 'YZX');

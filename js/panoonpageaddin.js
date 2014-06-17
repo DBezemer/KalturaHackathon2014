@@ -41,6 +41,8 @@ else
   		}
 	};
 	
+var ENABLE_HEAD_TRACKING=true;
+
 function handleheadtrackrStatusEvent(event) {
     //console.log(event.status);
 }
@@ -60,10 +62,10 @@ document.addEventListener('facetrackingEvent', handleFaceTrackingEvent);
 // requires headPosition : true in Tracker constructor
 document.addEventListener('headtrackingEvent', handleHeadTrackingEvent);
 document.addEventListener('headtrackrStatus', handleheadtrackrStatusEvent, true);
+var htracker;
 
 	function startHeadtrackr()
 	{
-		
 		htCanvas=document.createElement('canvas');
 		htCanvas.id='headtrackrCanvas';
 		htCanvas.width=320;
@@ -77,14 +79,31 @@ document.addEventListener('headtrackrStatus', handleheadtrackrStatusEvent, true)
 		htVideo.loop=true
 		//document.body.appendChild(htVideo);
   		
-		var htracker = new headtrackr.Tracker({
+		htracker = new headtrackr.Tracker({
 		  calcAngles : true,
   		  ui : false,
   	      headPosition : true // whether to calculate the head position
 		});
-  		htracker.init(htVideo, htCanvas);
-  		htracker.start();
+		if(ENABLE_HEAD_TRACKING)
+		{
+	  		htracker.init(htVideo, htCanvas);
+	  		htracker.start();
+  		}
   	}
+  	
+  	
+  
+  window.addEventListener("message",function(e) {
+    if(e.data=="TurnOffHeadTracking")
+    {
+    	try{
+	    	htracker.stop();
+	    } catch(e)
+	    {
+	    	console.log('Exception stopping head tracking: ', e);
+	    }
+	}
+  });
   	
   	loadjscssfiles(['js/headtrackr.js'],'js',startHeadtrackr);
   	
@@ -98,7 +117,8 @@ KalturaOfficeInfo= {"1_6mjnzjx1": "Kaltura Kitchen",
 "1_wmsowqoo": "Kaltura Lobby",
 "1_9seq8pkw": "Kaltura Elevators",
 "1_11gu6jks": "Bicycle video",
-"1_ynznt8o3": "Friday night at the hackathon"};
+"1_ynznt8o3": "Friday night at the hackathon",
+"1_eoff36sk": "Giroptic Sample"};
 
 var metaDataOverride={}
 
@@ -113,7 +133,7 @@ for(k in KalturaOfficeInfo)
 				"BottomAngle": "135", //"135",
 				"LeftAngle": "0",
 				"RightAngle": "360",
-				"SayAfterVideo": "That was "+KalturaOfficeInfo[k],
+				"SayAfterVideo": "",
 				"backgroundImage":"",
 				"SpeechPattern": [JSON.stringify({"regex":"bike","goto":"1_11gu6jks"}), 
 									JSON.stringify({"regex":"bicycle","goto":"1_11gu6jks"}),
@@ -131,11 +151,18 @@ for(k in KalturaOfficeInfo)
 									JSON.stringify({"regex":"lobby","goto":"1_wmsowqoo"}),
 									JSON.stringify({"regex":"meeting","goto":"1_n8m3w8y2"}),
 									JSON.stringify({"regex":"window","goto":"1_n8m3w8y2"}),
+									JSON.stringify({"regex":"Chiropractic","goto":"1_eoff36sk"}),
+									JSON.stringify({"regex":"skyrocket","goto":"1_eoff36sk"}),
+									JSON.stringify({"regex":"die real","goto":"1_eoff36sk"}),
+									JSON.stringify({"regex":"diuril","goto":"1_eoff36sk"}),
+									JSON.stringify({"regex":"Skyrim","goto":"1_eoff36sk"}),
 									JSON.stringify({"regex":"next","goto":"0_yk83ppmr","say":"going to next video"})],
 				}
 }
 metaDataOverride["1_11gu6jks"].TopAngle="0";
-metaDataOverride["1_11gu6jks"].BottomAngle="180";
+metaDataOverride["1_11gu6jks"].BottomAngle="180"; 
+metaDataOverride["1_eoff36sk"].TopAngle="0";
+metaDataOverride["1_eoff36sk"].BottomAngle="180"; 
 
 var DO_METADATA_UPDATE=true
 if(DO_METADATA_UPDATE)
