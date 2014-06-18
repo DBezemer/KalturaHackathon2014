@@ -1,4 +1,12 @@
 var uaIndex=navigator.userAgent.search('Chrome/');
+var KDP_ELEMENT;
+var ON_PAGE_ADDIN;
+function gotoEntryId(newId)
+{
+	KALTURA_ENTRYID=newId;
+	KDP_ELEMENT.sendNotification ('changeMedia', {'entryId':newId});
+}
+
 if(uaIndex<0 || parseInt(navigator.userAgent.substring(uaIndex+7).split('.')[0])<35)
 {
 	alert('Unsupported browser ('+navigator.userAgent+').\n'+
@@ -105,7 +113,7 @@ var htracker;
 	}
   });
   	
-  	loadjscssfiles(['js/headtrackr.js'],'js',startHeadtrackr);
+  	loadjscssfiles(['js/headtrackr.js'],'js');
   	
 	loadjscssfiles(['js/speechEngine.js'],'js');
 
@@ -171,7 +179,7 @@ KalturaDemoVideos= {"1_mhu02zpt": "Video courtesy of 360 Heros", //Sundance
 "1_dld4vkhe": "Video courtesy of 360 Heros", //Sharks
 "1_2z7caelb": "Video courtesy of 360 Heros", //Scuba
 "1_eoff36sk": "Video courtesy of Giroptic", //France
-"1_crrvzz9n": "Video taken on an iphone with a GoPano attachment"};
+"1_k82ost5w": "Sophie's birthday"};
 
 var metaDataOverride={}
 
@@ -207,8 +215,8 @@ for(k in KalturaDemoVideos)
 									JSON.stringify({"regex":"iphone","goto":"1_crrvzz9n"}),],
 				}
 }
-metaDataOverride["1_crrvzz9n"].TopAngle="45";
-metaDataOverride["1_crrvzz9n"].BottomAngle="135"; 
+metaDataOverride["1_k82ost5w"].TopAngle="45";
+metaDataOverride["1_k82ost5w"].BottomAngle="135"; 
 
 var DO_METADATA_UPDATE=false
 if(DO_METADATA_UPDATE)
@@ -270,6 +278,7 @@ console.log(metaDataOverride);
 	// This is a generic onPage plugin you will want to subscribe to the ready event: 
 	kWidget.addReadyCallback( function( playerId ){
 		var kdp = document.getElementById( playerId );
+		KDP_ELEMENT=kdp;
  
 		// Here you can check player configuration ( if needed )
 		// in this case we are checking if our plugin is enabled
@@ -288,7 +297,8 @@ console.log(metaDataOverride);
 	// There are a few conventions for creating javascirpt pseudo classes 
 	//  ( feel free use what you like )
 	panoOnPage = function( playerId ){
-		return this.init( playerId );
+		ON_PAGE_ADDIN= this.init( playerId );
+		return ON_PAGE_ADDIN;
 	};
 	panoOnPage.prototype = {
 		init:function( playerId ){
@@ -326,10 +336,7 @@ console.log(metaDataOverride);
 				{	
 					if('goto' in pattern)
 					{
-						var newId=pattern.goto;
-						KALTURA_ENTRYID=newId;
-						self.entryId=newId;
-						self.kdp.sendNotification ('changeMedia', {'entryId':pattern.goto});
+						gotoEntryId(pattern.goto);
 					}
 					if('say' in pattern)
 					{
@@ -390,9 +397,9 @@ console.log(metaDataOverride);
 			console.log('METADATA LOADED', this.customDataList);
 			
 			console.log('kdp: ',this.kdp);
-			if(this.entryId in metaDataOverride)
+			if(KALTURA_ENTRYID in metaDataOverride)
 			{
-				this.customDataList=metaDataOverride[this.entryId];
+				this.customDataList=metaDataOverride[KALTURA_ENTRYID];
 				console.log('METADATA OVERRIDDEN', this.customDataList);
 			}
 			this.iframe.contentWindow.postMessage(JSON.stringify({'metaData':this.customDataList}), "*");

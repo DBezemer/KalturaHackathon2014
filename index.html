@@ -7,6 +7,7 @@
     -moz-column-count: 2; /* Firefox */
     column-count: 2;
 }
+button.link { background:none;border:none; }
 </style>
 </head>
 <body>
@@ -53,12 +54,24 @@ This website is statically hosted! Thanks to Kaltura, no back end coding is need
 <button onClick="if(window.videoSpeechEngine) videoSpeechEngine.start();">Start Speech Recognition</button>
 <button onClick="if(window.videoHeadTracking) videoHeadTracking.start();">Start Head Tracking</button>
 <p>
+<p>
 Suggestions for speech recognition: suggest that you want to visit the window, kitchen, or server room...
 <p>
 Please allow the website to access your camera if you want to see head tracking in action...
 </div>
 
 <div style="width: 40%; float:right">
+   <h3>Available Videos</h3>
+   All hosted on Kaltura MediaSpace...
+   
+<ul>
+<li><button class="link" onClick="gotoEntryId('1_mhu02zpt')">Hang gliding</button>, courtesy of <a href="http://www.360heros.com/">360Heros</a>.</li>
+<li><button class="link" onClick="gotoEntryId('1_vckj4wvb')">Drone</button>, courtesy of <a href="http://www.360heros.com/">360Heros</a>.</li>
+<li><button class="link" onClick="gotoEntryId('1_dld4vkhe')">Scuba Diving</button>, courtesy of <a href="http://www.360heros.com/">360Heros</a>.</li>
+<li><button class="link" onClick="gotoEntryId('1_2z7caelb')">Sharks</button>, courtesy of <a href="http://www.360heros.com/">360Heros</a>.</li>
+<li><button class="link" onClick="gotoEntryId('1_eoff36sk')">City in France</button>, courtesy of <a href="http://www.giroptic.com/">Giroptic</a>.</li>
+<li><button class="link" onClick="gotoEntryId('1_k82ost5w')">Sophie's birthday</button>, taken by my with a <a href="http://www.gopano.com/">GoPano Micro</a>.</li>
+</ul>
    <h3>Features of the panorama viewer</h3>
    <ul>
    <li> Load 360 degree panoramic videos into mediaspace using the normal tools. Use the standard cylindrical projection produced by most
@@ -82,5 +95,16 @@ Please allow the website to access your camera if you want to see head tracking 
 		</blockquote>
 	</li>
 </div>
+<h3 align="center">Video Credits</h3>
+Thank you to Mike Kintner at <a href="http://www.360heros.com">360Heros</a> and Richard Ollier from <a href="http://www.giroptic.com">Giroptic</a> 
+for graciously agreeing to provide 360 panoramic videos which
+they agreed I could use in my presentation. Especially I would like to thank Mike for the extraordinary effort he made staying up
+until 3AM to provide some truly exceptional videos from his collection that have become the
+vast majority of the video library for this presentation. 
+Please take a look at <a href="http://www.360heros.com">http://www.360heros.com</a> and <a href="http://www.giroptic.com">http://www.giroptic.com</a> (and the currently
+active <a href="https://www.kickstarter.com/projects/giroptic/the-worlds-first-full-hd-360-camera">Giroptic Kickstarter campaign</a>).
+<a href="http://www.360heros.com"><img src="360Heros-AllAroundYou-Logo-500x147.png"></a>
+<a href=""></a>
+<a href=""></a>
 </body>
 </html>
