@@ -183,8 +183,17 @@ KalturaDemoVideos= {"1_mhu02zpt": "Video courtesy of 360 Heros", //Sundance
 
 var metaDataOverride={}
 
-OVERRIDE_METADATA=true;
-if(OVERRIDE_METADATA)
+OVERRIDE_METADATA=false;
+
+//Since OVERRIDE_METADATA is false, the entire code block below
+//which overrides and updates metadata, should be being ignored.
+//It is there for 2 reasons. (1) enable faster testing of changes to metadata
+//(2) to allow enable me to bulk upload metadata back to Kaltura.
+//In order for (2) to work, the variable KS_DO_NOT_SAVE_IN_CODE needs to be set.
+//Find the KS secret by logging in to your account
+//at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html
+
+if(OVERRIDE_METADATA) 
 {
 			
 for(k in KalturaDemoVideos)
@@ -210,15 +219,20 @@ for(k in KalturaDemoVideos)
 									JSON.stringify({"regex":"shark","goto":"1_dld4vkhe"}),
 									JSON.stringify({"regex":"france","goto":"1_eoff36sk"}),
 									JSON.stringify({"regex":"paris","goto":"1_eoff36sk"}),
-									JSON.stringify({"regex":"kaltura","goto":"1_crrvzz9n"}),
-									JSON.stringify({"regex":"gopano","goto":"1_crrvzz9n"}),
-									JSON.stringify({"regex":"iphone","goto":"1_crrvzz9n"}),],
+									JSON.stringify({"regex":"city","goto":"1_eoff36sk"}),
+									JSON.stringify({"regex":"sophie","goto":"1_k82ost5w"}),
+									JSON.stringify({"regex":"birthday","goto":"1_k82ost5w"}),
+									JSON.stringify({"regex":"happy","goto":"1_k82ost5w"}),
+									JSON.stringify({"regex":"party","goto":"1_k82ost5w"}),
+									JSON.stringify({"regex":"cake","goto":"1_k82ost5w"}),
+									JSON.stringify({"regex":"gopano","goto":"1_k82ost5w"}),
+									JSON.stringify({"regex":"iphone","goto":"1_k82ost5w"}),],
 				}
 }
 metaDataOverride["1_k82ost5w"].TopAngle="45";
 metaDataOverride["1_k82ost5w"].BottomAngle="135"; 
 
-var DO_METADATA_UPDATE=false
+var DO_METADATA_UPDATE=true
 if(DO_METADATA_UPDATE)
 {
 kwidgetAPI=new kWidget.api( {
@@ -226,7 +240,7 @@ kwidgetAPI=new kWidget.api( {
 		});
 //Find the KS secret by logging in at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html
 KS_DO_NOT_SAVE_IN_CODE='THIS IS A BOGUS KS CODE. Get the real code at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html'
-alert('KS secret is bogus. Code will fail. Get the real code at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html');
+//alert('KS secret is bogus. Code will fail. Get the real code at http://html5video.org/kaltura-player/kWidget/tests/kWidget.auth.html');
 for(var k in metaDataOverride)
 {
 	var xmlResults='<metadata><TopAngle>'+metaDataOverride[k].TopAngle+'</TopAngle><BottomAngle>'+metaDataOverride[k].BottomAngle+'</BottomAngle>';
@@ -385,6 +399,7 @@ console.log(metaDataOverride);
 
 		  // Add our commands to annyang
 		  		console.log('REGEX commands:',regexCommands);
+		  		videoSpeechEngine.removeCommands();
   				videoSpeechEngine.addRegexCommands(regexCommands);
 
 		  // Start listening. You can call this here, or attach this call to an event, button, etc.
