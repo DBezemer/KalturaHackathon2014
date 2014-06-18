@@ -11,3 +11,7 @@ This plugin transforms the panoramic videos using three.js. This allows the user
 In addition to the usual navigation choices the plugin supports voice navigation, giving a full immersion interactive virtual reality experience.
 
 You can also see a copy of the video presentation at http://cdnapi.kaltura.com/html5/html5lib/v1.9.6/mwEmbedFrame.php/p/1759182/uiconf_id/24670302/entry_id/1_wfb0fg73?wid=_1759182&amp;playerId=kaltura_player_1402851072&amp;entry_id=1_wfb0fg73
+
+- A note on licensing
+
+I have not decided the long term plans for licensing but for the moment I am offering the code under AGPL. In order to stay flexible, if you want to commit any code back to the project, please assign the copyright to me. You are, of course, free to fork the code however you like provided it complies with the terms of AGPL.
