@@ -1,6 +1,8 @@
 var uaIndex=navigator.userAgent.search('Chrome/');
 var KDP_ELEMENT;
 var ON_PAGE_ADDIN;
+var ENABLE_HEAD_TRACKING=true;
+
 function gotoEntryId(newId)
 {
 	KALTURA_ENTRYID=newId;
@@ -49,7 +51,6 @@ else
   		}
 	};
 	
-var ENABLE_HEAD_TRACKING=true;
 
 function handleheadtrackrStatusEvent(event) {
     //console.log(event.status);

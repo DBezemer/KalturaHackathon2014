@@ -11,11 +11,14 @@ button.link { background:none;border:none; }
 </style>
 </head>
 <body>
-<h1 align="center">Head tracking panoramas</h1>
+<div style="position:relative;min-width:960px">
+ <a href="https://github.com/patrickms/KalturaHackathon2014"><img style="position: absolute; top: 0; right: 0; border: 0;" alt="Fork me on GitHub" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+</div>
+<h1 align="center">A Panoramic Video Viewer supporting Virtual Reality and Head Tracking</h1>
 
 <div style="width: 60%; float:left">
-<h2> An iframe embedded video</h2>
-This can just be a regular website... The video player below is the Kaltura HTML5 player.
+<h2>Embedded Video on a Static Website</h2>
+This can just be a regular website... The video player below is the <a href="www.kaltura.com">Kaltura</a> HTML5 player.
 <p>
 
 <script src="http://cdnapi.kaltura.com/p/1759182/sp/175918200/embedIframeJs/uiconf_id/24705811/partner_id/1759182"></script>
@@ -79,8 +82,8 @@ Please allow the website to access your camera if you want to see head tracking 
    <ul>
    <li> Load 360 degree panoramic videos into mediaspace using the normal tools. Use the standard cylindrical projection produced by most
    panoramic photography systems</li>
-   <li> Edit your metadata Kaltura Mediaspace to specify field of view and voice links</li>
-   <li> Play panoramic videos in the Kaltura HTML5 player addin with a plugin. (Sorry but Flash is not supported)</li>
+   <li> Edit your metadata <a href="www.kaltura.com">Kaltura Mediaspace</a> to specify field of view and voice links</li>
+   <li> Play panoramic videos in the <a href="www.kaltura.com">Kaltura</a> HTML5 player addin with a plugin. (Sorry but Flash is not supported)</li>
    <li> The thumbnails are still usable (untransformed panoramic images) </li>
    <li> You can navigate with the "W" (up) "A" (left) "S" (right) and "D" (down) keys. </li>
    <li> Supports webcam based headtracking for changing perspective! </li>
@@ -94,21 +97,27 @@ Please allow the website to access your camera if you want to see head tracking 
 		</blockquote>
 	</li><li> Add a head tracking button to the web page with this line of html:
 		<blockquote>
-			&lt;button onClick=&quot;if(window.videoHeadTracking) videoHeadTracking.start();&quot;&gt;Start Speech Recognition&lt;/button&gt;
+			&lt;button onClick=&quot;if(window.startHeadtrackr) startHeadtrackr();&quot;&gt;Start Head Tracking&lt;/button&gt;
 		</blockquote>
 	</li>
 </div>
-<h3 align="center">Video Credits</h3>
+<div style="width: 100%; float:left">
+<h3 align="center">Credits</h3>
+Thank you to <a href="www.kaltura.com">Kaltura</a> for hosting the <a href="http://videoxhackathon.challengepost.com/">Video Experience Hackathon</a>
+where this plugin was written. And to the many open source libraries I used, in particular Headtrackr.js, Oculus Street View, vr.js,
+and three.js.
+<p>
 Thank you to Mike Kintner at <a href="http://www.360heros.com">360Heros</a> and Richard Ollier from <a href="http://www.giroptic.com">Giroptic</a> 
 for graciously agreeing to provide 360 panoramic videos which
 they agreed I could use in my presentation. Especially I would like to thank Mike for the extraordinary effort he made staying up
-until 3AM to provide some truly exceptional videos from his collection that have become the
-vast majority of the video library for this presentation. 
+until 3AM to provide some amazing videos from his collection that have become the
+core of the video library on this website. 
 Please take a look at <a href="http://www.360heros.com">http://www.360heros.com</a> and <a href="http://www.giroptic.com">http://www.giroptic.com</a> (and the currently
 active <a href="https://www.kickstarter.com/projects/giroptic/the-worlds-first-full-hd-360-camera">Giroptic Kickstarter campaign</a>).
 <p>
 <a href="http://www.360heros.com"><img src="360Heros-AllAroundYou-Logo-500x147.png"></a>
 <a href=""></a>
 <a href=""></a>
+</a>
 </body>
 </html>
