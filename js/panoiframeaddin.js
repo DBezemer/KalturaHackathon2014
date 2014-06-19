@@ -1,10 +1,5 @@
 //document.domain="http://localhost:8000/";
-var uaIndex=navigator.userAgent.search('Chrome/');
-if(uaIndex<0 || parseInt(navigator.userAgent.substring(uaIndex+7).split('.')[0])<35)
-{
-}
-else
-{
+
 var HEAD_LOCATION;
 var BG_IMAGE_NAME;
 var BG_IMAGE;
@@ -18,6 +13,12 @@ var video_right_angle=360;
 	var videoElement;
 	var canvasElement;
 	var targetElementForOSV;
+var uaIndex=navigator.userAgent.search('Chrome/');
+if(uaIndex<0 || parseInt(navigator.userAgent.substring(uaIndex+7).split('.')[0])<35)
+{
+}
+else
+{
 //	var THREE=THREE||{REVISION:"58"};
 	//Function from http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
 	function loadjscssfiles(filenames, filetype, callback){
