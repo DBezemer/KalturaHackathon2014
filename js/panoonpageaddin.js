@@ -74,6 +74,8 @@ var htracker;
 
 	function startHeadtrackr()
 	{
+		if(document.getElementById('headtrackrCanvas'))
+			return; 
 		htCanvas=document.createElement('canvas');
 		htCanvas.id='headtrackrCanvas';
 		htCanvas.width=320;
