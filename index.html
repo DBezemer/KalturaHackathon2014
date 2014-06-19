@@ -11,14 +11,18 @@ button.link { background:none;border:none; }
 </style>
 </head>
 <body>
-<h1 align="center">Adding panorama support to Kaltura</h1>
+<h1 align="center">Head tracking panoramas</h1>
 
 <div style="width: 60%; float:left">
-<h2> A Kaltura video embedded the normal way</h2>
+<h2> An iframe embedded video</h2>
 This can just be a regular website... The video player below is the Kaltura HTML5 player.
 <p>
 
 <script src="http://cdnapi.kaltura.com/p/1759182/sp/175918200/embedIframeJs/uiconf_id/24705811/partner_id/1759182"></script>
+<script>
+var queryDict = {}
+location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1]})
+</script>
 <div id="kaltura_player_1402702517" style="width: 640px; height: 480px;" itemprop="video" itemscope itemtype="http://schema.org/VideoObject">
 <span itemprop="name" content="DemoPano1.mov"></span>
 <span itemprop="description" content=""></span>
@@ -49,7 +53,7 @@ kWidget.embed({
 });
 </script>
 <p>
-This website is statically hosted! Thanks to Kaltura, no back end coding is needed at all! 
+This website is statically hosted! All the work is done in a Javascript plugin. 
 <p>
 <button onClick="if(window.videoSpeechEngine) videoSpeechEngine.start();">Start Speech Recognition</button>
 <button onClick="startHeadtrackr();">Start Head Tracking</button>
@@ -62,7 +66,6 @@ Please allow the website to access your camera if you want to see head tracking 
 
 <div style="width: 40%; float:right">
    <h3>Available Videos</h3>
-   All hosted on Kaltura MediaSpace...
    
 <ul>
 <li><button class="link" onClick="gotoEntryId('1_mhu02zpt')">Hang gliding</button>, courtesy of <a href="http://www.360heros.com/">360Heros</a>.</li>
@@ -76,7 +79,7 @@ Please allow the website to access your camera if you want to see head tracking 
    <ul>
    <li> Load 360 degree panoramic videos into mediaspace using the normal tools. Use the standard cylindrical projection produced by most
    panoramic photography systems</li>
-   <li> Edit your metadata in Kaltura to specify field of view and voice links</li>
+   <li> Edit your metadata Kaltura Mediaspace to specify field of view and voice links</li>
    <li> Play panoramic videos in the Kaltura HTML5 player addin with a plugin. (Sorry but Flash is not supported)</li>
    <li> The thumbnails are still usable (untransformed panoramic images) </li>
    <li> You can navigate with the "W" (up) "A" (left) "S" (right) and "D" (down) keys. </li>
@@ -84,7 +87,7 @@ Please allow the website to access your camera if you want to see head tracking 
    <li> For computers with gyroscopes, change orientation with the gyroscope.</li>
    <li> Expands to two full screen views. A regular full screen view and a Oculus RIft full screen view with full head tracking (requires the <a href="https://github.com/benvanik/vr.js/tree/master">vr.js</a> browser plugin)!</li>
    <li> Supports speech recognition! Navigate between pages by using web speech recognition. Speech recognition is initiated by pressing the "z" key.</li>
-   <li> Speech commands are Kaltura metadata which can be edited using the mediaspace API.</li>
+   <li> Speech commands are editable metadata.</li>
    <li> Add a speech recognition button to the web page with this line of html:
 		<blockquote>
 			&lt;button onClick=&quot;if(window.videoSpeechEngine) videoSpeechEngine.start();&quot;&gt;Start Speech Recognition&lt;/button&gt;
